@@ -1,0 +1,3091 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CYBERSTRIKE 3D: SECTOR OMEGA</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #050210;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    #c {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: crosshair;
+    }
+
+    #cross {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 24px;
+      height: 24px;
+      pointer-events: none;
+      z-index: 10;
+      transition: opacity 0.15s;
+    }
+
+    .cb {
+      position: absolute;
+      background: #ff00ff;
+      box-shadow: 0 0 6px #ff00ff;
+    }
+
+    .ch {
+      top: 11px;
+      left: -10px;
+      width: 44px;
+      height: 2px;
+    }
+
+    .cv {
+      top: -10px;
+      left: 11px;
+      width: 2px;
+      height: 44px;
+    }
+
+    .cd {
+      position: absolute;
+      top: 9px;
+      left: 9px;
+      width: 6px;
+      height: 6px;
+      background: #00ffff;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #00ffff;
+    }
+
+    #hit {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 26px;
+      height: 26px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.08s ease-out;
+      z-index: 11;
+    }
+
+    .hl {
+      position: absolute;
+      background: #fff;
+      box-shadow: 0 0 6px #ff0055;
+    }
+
+    .h1 { top: 2px; left: 2px; width: 7px; height: 2px; transform: rotate(45deg); }
+    .h2 { top: 2px; right: 2px; width: 7px; height: 2px; transform: rotate(-45deg); }
+    .h3 { bottom: 2px; left: 2px; width: 7px; height: 2px; transform: rotate(-45deg); }
+    .h4 { bottom: 2px; right: 2px; width: 7px; height: 2px; transform: rotate(45deg); }
+
+    #cw {
+      position: absolute;
+      top: calc(50% + 35px);
+      left: 50%;
+      transform: translateX(-50%);
+      width: 150px;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      pointer-events: none;
+      z-index: 15;
+    }
+
+    #cl {
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      color: #ffaa00;
+      text-shadow: 0 0 8px #ffaa00;
+      margin-bottom: 4px;
+    }
+
+    .ct {
+      width: 100%;
+      height: 8px;
+      background: rgba(10, 16, 30, 0.85);
+      border: 1px solid #ffaa00;
+      border-radius: 4px;
+      overflow: hidden;
+      box-shadow: 0 0 10px rgba(255, 170, 0, 0.3);
+    }
+
+    #cf {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #ffaa00, #ff0055);
+    }
+
+    #scope {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      display: none;
+      z-index: 12;
+    }
+
+    .sc {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: min(80vmin, 80vmin);
+      height: min(80vmin, 80vmin);
+      border-radius: 50%;
+      box-shadow: 0 0 0 2000px rgba(5, 2, 16, 0.98);
+      border: 2px solid rgba(255, 0, 255, 0.6);
+    }
+
+    .slh {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: rgba(255, 0, 255, 0.7);
+      box-shadow: 0 0 5px #ff00ff;
+    }
+
+    .slv {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: rgba(255, 0, 255, 0.7);
+      box-shadow: 0 0 5px #ff00ff;
+    }
+
+    .scc {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 4px;
+      height: 4px;
+      background: #00ffff;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #00ffff;
+    }
+
+    #hud {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    .hb {
+      position: absolute;
+      background: rgba(15, 5, 25, 0.85);
+      border: 1px solid rgba(255, 0, 255, 0.4);
+      backdrop-filter: blur(8px);
+      padding: 12px 20px;
+      border-radius: 6px;
+      color: #fff;
+      box-shadow: 0 0 15px rgba(255, 0, 255, 0.15);
+    }
+
+    #top {
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 30px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      font-size: 15px;
+    }
+
+    #top span {
+      color: #00ffff;
+      text-shadow: 0 0 6px #00ffff;
+    }
+
+    #hp {
+      bottom: 24px;
+      left: 24px;
+      min-width: 250px;
+    }
+
+    .lbl {
+      font-size: 12px;
+      letter-spacing: 2px;
+      color: #bd93f9;
+      margin-bottom: 6px;
+    }
+
+    .bw {
+      width: 100%;
+      height: 14px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 3px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    #hpf {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, #ff0055, #ff00ff);
+      box-shadow: 0 0 10px #ff0055;
+      transition: width 0.1s ease-out;
+    }
+
+    #di {
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: bold;
+      color: #00ffff;
+      letter-spacing: 1px;
+    }
+
+    .db {
+      flex: 1;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    #df {
+      width: 100%;
+      height: 100%;
+      background: #00ffff;
+      box-shadow: 0 0 6px #00ffff;
+    }
+
+    #wp {
+      bottom: 24px;
+      right: 24px;
+      min-width: 240px;
+      text-align: right;
+    }
+
+    .wn {
+      font-size: 13px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      color: #ffd700;
+      margin-bottom: 2px;
+    }
+
+    .av {
+      font-size: 34px;
+      font-weight: 900;
+      color: #00ffff;
+      text-shadow: 0 0 12px rgba(0, 255, 255, 0.6);
+      line-height: 1;
+    }
+
+    .gr {
+      margin-top: 6px;
+      font-size: 13px;
+      letter-spacing: 1px;
+      color: #ff0055;
+      font-weight: bold;
+    }
+
+    #rw {
+      top: 20px;
+      right: 24px;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      position: absolute;
+      background: rgba(15, 5, 25, 0.85);
+      border: 2px solid rgba(255, 0, 255, 0.5);
+      box-shadow: 0 0 15px rgba(255, 0, 255, 0.2);
+      overflow: hidden;
+    }
+
+    #rc {
+      width: 100%;
+      height: 100%;
+    }
+
+    #dm {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle, transparent 40%, rgba(255, 0, 80, 0.6) 100%);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.1s ease-out;
+      z-index: 8;
+    }
+
+    #hm {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle, transparent 40%, rgba(0, 255, 200, 0.5) 100%);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.15s ease-out;
+      z-index: 9;
+    }
+
+    #menu {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(20, 10, 40, 0.96), rgba(5, 2, 16, 0.99));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+
+    .ti {
+      font-size: 52px;
+      font-weight: 900;
+      letter-spacing: 6px;
+      color: #ff00ff;
+      text-shadow: 0 0 30px rgba(255, 0, 255, 0.8);
+      margin-bottom: 6px;
+      text-align: center;
+    }
+
+    .su {
+      color: #bd93f9;
+      font-size: 15px;
+      letter-spacing: 3px;
+      margin-bottom: 35px;
+    }
+
+    .pb {
+      background: linear-gradient(135deg, #ff00ff, #bd00ff);
+      color: #fff;
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: 3px;
+      padding: 18px 56px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 0 35px rgba(255, 0, 255, 0.5);
+      transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .pb:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 50px rgba(255, 0, 255, 0.9);
+      color: #fff;
+    }
+
+    .hi {
+      margin-top: 35px;
+      color: #8a7fa0;
+      font-size: 14px;
+      line-height: 2;
+      text-align: center;
+    }
+
+    .hi b {
+      color: #00ffff;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="c"></canvas>
+
+  <div id="cross">
+    <div class="cb ch"></div>
+    <div class="cb cv"></div>
+    <div class="cd"></div>
+  </div>
+
+  <div id="hit">
+    <div class="hl h1"></div>
+    <div class="hl h2"></div>
+    <div class="hl h3"></div>
+    <div class="hl h4"></div>
+  </div>
+
+  <div id="cw">
+    <div id="cl">СИЛА БРОСКА: 0%</div>
+    <div class="ct"><div id="cf"></div></div>
+  </div>
+
+  <div id="scope">
+    <div class="sc">
+      <div class="slh"></div>
+      <div class="slv"></div>
+      <div class="scc"></div>
+    </div>
+  </div>
+
+  <div id="dm"></div>
+  <div id="hm"></div>
+
+  <div id="hud">
+    <div id="top" class="hb">
+      <div>ВОЛНА: <span id="wv">1</span></div>
+      <div>СЧЕТ: <span id="sv">0</span></div>
+      <div>ВРАГОВ: <span id="ev">0</span></div>
+    </div>
+
+    <div id="rw">
+      <canvas id="rc" width="120" height="120"></canvas>
+    </div>
+
+    <div id="hp" class="hb">
+      <div class="lbl">ЭНЕРГОБРОНЯ: <span id="hv">100</span>%</div>
+      <div class="bw"><div id="hpf"></div></div>
+      <div id="di">
+        <span>РЫВОК [E / F]:</span>
+        <div class="db"><div id="df"></div></div>
+      </div>
+    </div>
+
+    <div id="wp" class="hb">
+      <div id="wnd" class="wn">1. ПЛАЗМЕННЫЙ КАРАБИН</div>
+      <div class="av">
+        <span id="ac">30</span>
+        <span style="font-size:18px;color:#557297" id="am"> / 30</span>
+      </div>
+      <div class="gr">
+        ГРАНАТЫ [G]: <span id="gv" style="color:#00ffff">3</span> / 3
+      </div>
+    </div>
+  </div>
+
+  <div id="menu">
+    <div class="ti">CYBERSTRIKE 3D</div>
+    <div class="su">ЭЛИТНЫЙ ТАКТИЧЕСКИЙ СЕКТОР</div>
+    <button id="start" class="pb" type="button">НАЧАТЬ БОЙ</button>
+    <div class="hi">
+      <b>1-5</b> — Оружие | <b>ПКМ</b> — Открытый чистый прицел<br>
+      <b>E / F</b> — Тактический рывок | <b>G (Зажать)</b> — Бросок правой рукой<br>
+      <b>R</b> — Перезарядка левой рукой | <b>W, A, S, D</b> — Бег<br>
+      <b style="color:#00ff88">Зелёные платформы со стрелками — трамплины для прыжков!</b>
+    </div>
+  </div>
+
+  <script>
+    'use strict';
+
+    function fin(v, f) {
+      return Number.isFinite(v) ? v : f;
+    }
+
+    function cl(v, a, b) {
+      if (v < a) return a;
+      if (v > b) return b;
+      return v;
+    }
+
+    let AC = null;
+    let MG = null;
+    let NB = null;
+
+    function initAudio() {
+      try {
+        if (!AC) {
+          AC = new (window.AudioContext || window.webkitAudioContext)();
+          MG = AC.createGain();
+          MG.gain.value = 0.9;
+
+          const comp = AC.createDynamicsCompressor();
+          comp.threshold.value = -18;
+          comp.knee.value = 24;
+          comp.ratio.value = 8;
+          comp.attack.value = 0.003;
+          comp.release.value = 0.25;
+
+          MG.connect(comp);
+          comp.connect(AC.destination);
+
+          const len = Math.floor(AC.sampleRate * 2);
+          NB = AC.createBuffer(1, len, AC.sampleRate);
+          const d = NB.getChannelData(0);
+          for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+        }
+
+        if (AC.state === 'suspended') AC.resume();
+      } catch (e) {}
+    }
+
+    function snd(type) {
+      if (!AC) return;
+
+      try {
+        const t = AC.currentTime;
+        const OUT = MG || AC.destination;
+        if (!OUT) return;
+
+        function pn(p) {
+          try {
+            if (AC.createStereoPanner) {
+              const x = AC.createStereoPanner();
+              x.pan.value = p;
+              x.connect(OUT);
+              return x;
+            }
+          } catch (e) {}
+          return OUT;
+        }
+
+        function nz(d, ft, f0, f1, q, g, dl, p) {
+          const st = t + (dl || 0);
+          const dest = p ? pn(p) : OUT;
+          const s = AC.createBufferSource();
+          s.buffer = NB;
+          s.loop = true;
+
+          const f = AC.createBiquadFilter();
+          f.type = ft;
+          f.Q.value = q || 0.8;
+          f.frequency.setValueAtTime(Math.max(20, f0), st);
+          if (f1 && f1 !== f0) f.frequency.exponentialRampToValueAtTime(Math.max(20, f1), st + d);
+
+          const ga = AC.createGain();
+          ga.gain.setValueAtTime(Math.max(0.0001, g), st);
+          ga.gain.exponentialRampToValueAtTime(0.0001, st + d);
+
+          s.connect(f);
+          f.connect(ga);
+          ga.connect(dest);
+
+          s.start(st, Math.random());
+          s.stop(st + d + 0.05);
+        }
+
+        function os(d, ty, f0, f1, g, dl, p) {
+          const st = t + (dl || 0);
+          const dest = p ? pn(p) : OUT;
+          const o = AC.createOscillator();
+          o.type = ty;
+          o.frequency.setValueAtTime(Math.max(20, f0), st);
+          if (f1 && f1 !== f0) o.frequency.exponentialRampToValueAtTime(Math.max(20, f1), st + d);
+
+          const ga = AC.createGain();
+          ga.gain.setValueAtTime(Math.max(0.0001, g), st);
+          ga.gain.exponentialRampToValueAtTime(0.0001, st + d);
+
+          o.connect(ga);
+          ga.connect(dest);
+
+          o.start(st);
+          o.stop(st + d + 0.05);
+        }
+
+        function sub(d, f0, f1, g, dl) {
+          os(d, 'sine', f0, f1, g, dl);
+          os(d * 0.9, 'sine', f0 * 1.5, f1 * 1.4, g * 0.4, dl);
+          os(d * 0.7, 'triangle', f0 * 0.5, f1 * 0.5, g * 0.3, dl);
+        }
+
+        function clk(g, dl, fb) {
+          const b = fb || 3200;
+          nz(0.025, 'bandpass', b, b * 0.7, 6.0, g * 0.7, dl);
+          os(0.03, 'square', b * 1.4, b * 0.9, g * 0.35, dl);
+          os(0.02, 'triangle', b * 2.7, b * 2.0, g * 0.2, dl);
+        }
+
+        function met(g, dl, f0, f1) {
+          const a = f0 || 1800;
+          const b = f1 || 700;
+          nz(0.08, 'bandpass', a, b, 3.0, g * 0.8, dl);
+          os(0.06, 'square', a * 0.7, b * 0.6, g * 0.35, dl);
+          os(0.04, 'triangle', a * 1.8, b * 1.2, g * 0.2, dl + 0.01);
+        }
+
+        function thud(g, dl) {
+          sub(0.10, 120, 45, g, dl);
+          nz(0.08, 'lowpass', 500, 120, 0.8, g * 0.55, dl);
+        }
+
+        function clang(g, dl) {
+          clk(g, dl, 3200);
+          os(0.09, 'square', 1100, 260, g * 0.55, dl + 0.005);
+          os(0.13, 'triangle', 620, 180, g * 0.35, dl + 0.01);
+          nz(0.11, 'bandpass', 2400, 900, 2.5, g * 0.45, dl + 0.015);
+          nz(0.20, 'lowpass', 900, 120, 0.8, g * 0.22, dl + 0.035);
+        }
+
+        switch (type) {
+          case 'rifle':
+            sub(0.16, 140, 40, 0.55);
+            nz(0.03, 'highpass', 4500, 4500, 0.7, 0.30);
+            os(0.09, 'sawtooth', 900, 180, 0.20);
+            nz(0.10, 'bandpass', 2400, 500, 0.9, 0.40);
+            clk(0.15, 0, 3000);
+            nz(0.16, 'lowpass', 800, 180, 0.7, 0.16, 0.03, -0.22);
+            nz(0.18, 'lowpass', 900, 120, 0.7, 0.14, 0.10, 0.25);
+            nz(0.22, 'lowpass', 600, 90, 0.7, 0.09, 0.20, -0.25);
+            break;
+
+          case 'pistol':
+            sub(0.11, 200, 60, 0.45);
+            nz(0.025, 'highpass', 5000, 5000, 0.7, 0.32);
+            os(0.06, 'square', 1300, 350, 0.16);
+            nz(0.06, 'highpass', 2600, 2600, 0.8, 0.34);
+            clk(0.14, 0, 3600);
+            nz(0.10, 'lowpass', 900, 250, 0.7, 0.12, 0.02, 0.20);
+            nz(0.14, 'lowpass', 1000, 150, 0.7, 0.12, 0.09, 0.20);
+            nz(0.18, 'lowpass', 700, 100, 0.7, 0.07, 0.18, -0.20);
+            break;
+
+          case 'shotgun':
+            sub(0.34, 90, 26, 0.90);
+            nz(0.03, 'highpass', 4200, 4200, 0.7, 0.40);
+            os(0.20, 'sawtooth', 160, 40, 0.30);
+            nz(0.05, 'highpass', 3800, 3800, 0.7, 0.50);
+            nz(0.14, 'bandpass', 2600, 700, 0.9, 0.50);
+            nz(0.32, 'lowpass', 1200, 90, 0.7, 0.70);
+            clk(0.20, 0.02, 2400);
+            nz(0.40, 'lowpass', 500, 60, 0.7, 0.30, 0.06, -0.25);
+            nz(0.50, 'lowpass', 300, 40, 0.7, 0.18, 0.16, 0.25);
+            nz(0.60, 'lowpass', 200, 30, 0.7, 0.12, 0.30, 0.20);
+            break;
+
+          case 'sniper':
+            sub(0.34, 90, 24, 0.72);
+            nz(0.03, 'highpass', 5200, 5200, 0.7, 0.42);
+            nz(0.06, 'highpass', 3000, 3000, 0.7, 0.42);
+            nz(0.34, 'bandpass', 2600, 260, 0.9, 0.42);
+            clk(0.20, 0, 2800);
+            nz(0.45, 'lowpass', 700, 90, 0.7, 0.22, 0.07, -0.30);
+            nz(0.55, 'lowpass', 400, 60, 0.7, 0.16, 0.16, 0.30);
+            nz(0.65, 'lowpass', 250, 40, 0.7, 0.10, 0.28, -0.20);
+            nz(0.80, 'lowpass', 180, 25, 0.7, 0.07, 0.42, 0.20);
+            break;
+
+          case 'railgun':
+            os(0.30, 'sawtooth', 2400, 300, 0.30);
+            os(0.25, 'sine', 3000, 500, 0.30);
+            sub(0.50, 80, 22, 0.78);
+            nz(0.03, 'highpass', 6000, 6000, 0.7, 0.40);
+            nz(0.45, 'bandpass', 3800, 140, 1.0, 0.55);
+            clk(0.20, 0, 2400);
+            nz(0.05, 'highpass', 5000, 5000, 0.7, 0.28, 0.08, 0.25);
+            nz(0.05, 'highpass', 4300, 4300, 0.7, 0.22, 0.15, -0.25);
+            nz(0.60, 'lowpass', 500, 60, 0.7, 0.20, 0.10, -0.30);
+            nz(0.75, 'lowpass', 300, 40, 0.7, 0.13, 0.24, 0.30);
+            nz(0.90, 'lowpass', 200, 25, 0.7, 0.09, 0.40, -0.20);
+            break;
+
+          case 'hit':
+            nz(0.018, 'bandpass', 1500, 1200, 1.2, 0.030);
+            os(0.012, 'sine', 1000, 800, 0.020);
+            break;
+
+          case 'dash':
+            nz(0.24, 'bandpass', 350, 2400, 1.0, 0.40);
+            sub(0.16, 90, 45, 0.22);
+            os(0.20, 'triangle', 280, 760, 0.10);
+            nz(0.10, 'highpass', 3000, 3000, 0.7, 0.10, 0.05, 0.20);
+            break;
+
+          case 'launch':
+            sub(0.30, 140, 40, 0.60);
+            os(0.25, 'sine', 120, 700, 0.40);
+            os(0.35, 'sawtooth', 400, 2600, 0.25);
+            os(0.30, 'square', 800, 3200, 0.15, 0.02);
+            nz(0.30, 'bandpass', 600, 3600, 1.2, 0.35);
+            os(0.12, 'square', 1200, 2400, 0.12, 0.05);
+            nz(0.08, 'highpass', 4500, 4500, 0.7, 0.18, 0.03, 0.20);
+            break;
+
+          case 'stepL':
+            nz(0.055, 'lowpass', 480, 170, 0.7, 0.13);
+            os(0.045, 'sine', 105, 58, 0.07);
+            nz(0.02, 'bandpass', 2600, 2600, 2.0, 0.05);
+            break;
+
+          case 'stepR':
+            nz(0.055, 'lowpass', 420, 150, 0.7, 0.11);
+            os(0.045, 'sine', 92, 52, 0.06);
+            nz(0.02, 'bandpass', 2300, 2300, 2.0, 0.045);
+            break;
+
+          case 'heal':
+            os(0.35, 'sine', 320, 320, 0.22);
+            os(0.40, 'sine', 480, 480, 0.16, 0.05);
+            os(0.45, 'sine', 640, 640, 0.12, 0.10);
+            os(0.08, 'square', 880, 880, 0.10);
+            os(0.08, 'square', 1174, 1174, 0.10, 0.07);
+            os(0.10, 'square', 1568, 1568, 0.10, 0.14);
+            nz(0.03, 'bandpass', 2400, 2400, 3.0, 0.18);
+            clk(0.12, 0, 2000);
+            nz(0.25, 'highpass', 6000, 6000, 0.7, 0.07, 0.03);
+            break;
+
+          case 'hurt':
+            sub(0.16, 130, 45, 0.34);
+            nz(0.12, 'lowpass', 700, 180, 0.7, 0.26);
+            break;
+
+          case 'grenade':
+            sub(0.62, 62, 20, 0.80);
+            nz(0.55, 'lowpass', 600, 55, 0.7, 0.70);
+            nz(0.08, 'highpass', 2800, 2800, 0.7, 0.45);
+            nz(0.30, 'bandpass', 320, 320, 0.8, 0.35, 0.02, -0.20);
+            nz(0.70, 'lowpass', 420, 50, 0.7, 0.28, 0.09, 0.30);
+            nz(0.85, 'lowpass', 260, 35, 0.7, 0.18, 0.20, -0.30);
+            nz(1.00, 'lowpass', 160, 25, 0.7, 0.11, 0.34, 0.20);
+            break;
+
+          case 'boom':
+            sub(0.40, 80, 24, 0.70);
+            os(0.25, 'sawtooth', 200, 40, 0.40);
+            nz(0.30, 'lowpass', 900, 80, 0.7, 0.60);
+            nz(0.06, 'highpass', 2400, 2400, 0.7, 0.40);
+            nz(0.45, 'lowpass', 300, 40, 0.7, 0.25, 0.08, 0.20);
+            break;
+
+          case 'laser':
+            os(0.16, 'sawtooth', 420, 70, 0.35);
+            os(0.12, 'square', 300, 60, 0.22, 0.01);
+            nz(0.10, 'bandpass', 1200, 300, 2.0, 0.30);
+            sub(0.14, 110, 40, 0.30);
+            nz(0.04, 'highpass', 3000, 3000, 0.7, 0.22);
+            break;
+
+          case 'throw':
+            nz(0.13, 'bandpass', 450, 1300, 1.0, 0.30);
+            nz(0.05, 'highpass', 2500, 2500, 0.7, 0.10, 0.02);
+            break;
+
+          case 'charge':
+            os(0.20, 'triangle', 150, 430, 0.16);
+            nz(0.20, 'bandpass', 700, 1700, 1.0, 0.10);
+            break;
+
+          case 'pumpB':
+            nz(0.09, 'bandpass', 900, 300, 3.0, 0.40);
+            clk(0.30, 0, 1800);
+            os(0.07, 'square', 220, 120, 0.25);
+            nz(0.05, 'highpass', 3000, 3000, 2.0, 0.25, 0.06);
+            break;
+
+          case 'pumpF':
+            nz(0.09, 'bandpass', 400, 1400, 3.0, 0.42);
+            clk(0.34, 0.02, 2600);
+            os(0.08, 'square', 160, 320, 0.28);
+            nz(0.04, 'highpass', 4200, 4200, 2.0, 0.30, 0.09);
+            break;
+
+          case 'rr0':
+            clk(0.18, 0, 2400);
+            os(0.04, 'square', 700, 350, 0.12);
+            nz(0.04, 'bandpass', 1400, 800, 2.0, 0.10);
+            break;
+
+          case 'rr1':
+            met(0.28, 0, 2100, 750);
+            nz(0.10, 'highpass', 3200, 2200, 1.5, 0.16, 0.03);
+            thud(0.14, 0.09);
+            break;
+
+          case 'rr2':
+            thud(0.22, 0);
+            clk(0.22, 0.035, 2200);
+            nz(0.05, 'bandpass', 1100, 600, 2.0, 0.14, 0.05);
+            break;
+
+          case 'rr3':
+            nz(0.10, 'bandpass', 1200, 2600, 2.0, 0.24);
+            os(0.08, 'sawtooth', 360, 820, 0.14);
+            clk(0.14, 0.06, 2000);
+            break;
+
+          case 'rr4':
+            clang(0.34, 0);
+            break;
+
+          case 'rp0':
+            clk(0.24, 0, 3000);
+            os(0.05, 'square', 900, 350, 0.16);
+            nz(0.04, 'bandpass', 1600, 900, 2.0, 0.12);
+            break;
+
+          case 'rp1':
+            met(0.30, 0, 2400, 850);
+            nz(0.08, 'highpass', 3600, 2400, 1.5, 0.18, 0.02);
+            thud(0.16, 0.08);
+            break;
+
+          case 'rp2':
+            thud(0.24, 0);
+            clk(0.26, 0.03, 2600);
+            nz(0.04, 'bandpass', 1300, 700, 2.0, 0.14, 0.045);
+            break;
+
+          case 'rp3':
+            clang(0.38, 0);
+            nz(0.05, 'highpass', 3400, 3400, 0.8, 0.18, 0.02);
+            break;
+
+          case 'rs0':
+            nz(0.06, 'bandpass', 850, 420, 2.0, 0.28);
+            os(0.07, 'sine', 210, 125, 0.22);
+            clk(0.13, 0.02, 1800);
+            break;
+
+          case 'rs1':
+            nz(0.06, 'bandpass', 780, 380, 2.0, 0.28);
+            os(0.07, 'sine', 190, 115, 0.22);
+            clk(0.13, 0.02, 1700);
+            break;
+
+          case 'rs2':
+            nz(0.10, 'bandpass', 950, 320, 3.0, 0.42);
+            clk(0.30, 0, 1800);
+            os(0.08, 'square', 230, 125, 0.26);
+            break;
+
+          case 'rs3':
+            nz(0.10, 'bandpass', 420, 1450, 3.0, 0.44);
+            clk(0.36, 0.02, 2600);
+            os(0.09, 'square', 170, 340, 0.30);
+            nz(0.05, 'highpass', 4300, 4300, 2.0, 0.30, 0.09);
+            break;
+
+          case 'rn0':
+            nz(0.13, 'bandpass', 650, 260, 3.0, 0.40);
+            os(0.12, 'sawtooth', 320, 130, 0.25);
+            clk(0.20, 0.06, 1500);
+            break;
+
+          case 'rn1':
+            os(0.14, 'sine', 920, 520, 0.20);
+            nz(0.08, 'bandpass', 1800, 900, 2.0, 0.16, 0.03);
+            clk(0.16, 0.09, 2200);
+            break;
+
+          case 'rn2':
+            thud(0.20, 0);
+            os(0.12, 'sine', 520, 920, 0.20, 0.04);
+            clk(0.20, 0.10, 2400);
+            break;
+
+          case 'rn3':
+            clang(0.36, 0);
+            os(0.10, 'triangle', 420, 160, 0.18, 0.03);
+            break;
+
+          case 'rg0':
+            nz(0.36, 'highpass', 1200, 3200, 0.7, 0.36);
+            nz(0.30, 'bandpass', 820, 2100, 1.0, 0.24);
+            clk(0.18, 0.10, 1200);
+            break;
+
+          case 'rg1':
+            sub(0.16, 125, 52, 0.48);
+            met(0.30, 0.02, 1200, 500);
+            clk(0.24, 0.08, 1600);
+            break;
+
+          case 'rg2':
+            thud(0.34, 0);
+            clk(0.30, 0.04, 1800);
+            os(0.10, 'square', 220, 110, 0.28);
+            nz(0.06, 'bandpass', 760, 420, 2.0, 0.18, 0.06);
+            break;
+
+          case 'rg3':
+            os(0.50, 'sawtooth', 120, 900, 0.30);
+            os(0.50, 'sine', 60, 450, 0.30);
+            nz(0.40, 'bandpass', 600, 2500, 1.0, 0.20);
+            clk(0.25, 0.20, 2000);
+            break;
+        }
+      } catch (e) {}
+    }
+
+    const vs = `
+      attribute vec3 aPos;
+      attribute vec3 aNormal;
+      attribute vec4 aColor;
+      uniform mat4 uProj;
+      uniform mat4 uView;
+      uniform mat4 uModel;
+      varying vec4 vColor;
+      varying vec3 vNormal;
+      varying float vDist;
+      void main() {
+        vec4 wp = uModel * vec4(aPos, 1.0);
+        vec4 vp = uView * wp;
+        gl_Position = uProj * vp;
+        vNormal = (uModel * vec4(aNormal, 0.0)).xyz;
+        vColor = aColor;
+        vDist = length(wp.xyz);
+      }
+    `;
+
+    const fs = `
+      precision mediump float;
+      varying vec4 vColor;
+      varying vec3 vNormal;
+      varying float vDist;
+      uniform int uVM;
+      void main() {
+        vec3 n = normalize(vNormal);
+        vec3 sun = normalize(vec3(0.4, 0.85, 0.3));
+        float diff = max(dot(n, sun), 0.0);
+        vec3 col = vColor.rgb * (0.35 + diff * 0.65);
+        if (uVM == 0) {
+          col += vec3(0.1, 0.0, 0.2) * max(0.0, -n.y) * 0.2;
+          col = mix(col, vec3(0.05, 0.02, 0.12), clamp((vDist - 20.0) / 100.0, 0.0, 1.0));
+        } else {
+          col += vec3(0.08, 0.10, 0.14) * (1.0 - max(dot(n, vec3(0.0, 0.0, 1.0)), 0.0)) * 0.3;
+        }
+        gl_FragColor = vec4(col, vColor.a);
+      }
+    `;
+
+    const cv = document.getElementById('c');
+    const gl = cv.getContext('webgl', { antialias: true });
+
+    if (!gl) {
+      document.body.innerHTML = '<div style="color:#fff;padding:40px;font-size:20px">WebGL не поддерживается.</div>';
+      throw new Error('No WebGL');
+    }
+
+    function mkSh(t, s) {
+      const sh = gl.createShader(t);
+      gl.shaderSource(sh, s);
+      gl.compileShader(sh);
+      return sh;
+    }
+
+    const pr = gl.createProgram();
+    gl.attachShader(pr, mkSh(gl.VERTEX_SHADER, vs));
+    gl.attachShader(pr, mkSh(gl.FRAGMENT_SHADER, fs));
+    gl.linkProgram(pr);
+    gl.useProgram(pr);
+
+    const aPos = gl.getAttribLocation(pr, 'aPos');
+    const aNor = gl.getAttribLocation(pr, 'aNormal');
+    const aCol = gl.getAttribLocation(pr, 'aColor');
+    gl.enableVertexAttribArray(aPos);
+    gl.enableVertexAttribArray(aNor);
+    gl.enableVertexAttribArray(aCol);
+
+    const uProj = gl.getUniformLocation(pr, 'uProj');
+    const uView = gl.getUniformLocation(pr, 'uView');
+    const uModel = gl.getUniformLocation(pr, 'uModel');
+    const uVM = gl.getUniformLocation(pr, 'uVM');
+
+    function cubeData() {
+      const p = [];
+      const n = [];
+      const faces = [
+        { n: [0, 0, 1], v: [[-0.5,-0.5,0.5],[0.5,-0.5,0.5],[0.5,0.5,0.5],[-0.5,0.5,0.5]] },
+        { n: [0, 0,-1], v: [[0.5,-0.5,-0.5],[-0.5,-0.5,-0.5],[-0.5,0.5,-0.5],[0.5,0.5,-0.5]] },
+        { n: [0, 1, 0], v: [[-0.5,0.5,0.5],[0.5,0.5,0.5],[0.5,0.5,-0.5],[-0.5,0.5,-0.5]] },
+        { n: [0,-1, 0], v: [[-0.5,-0.5,-0.5],[0.5,-0.5,-0.5],[0.5,-0.5,0.5],[-0.5,-0.5,0.5]] },
+        { n: [1, 0, 0], v: [[0.5,-0.5,0.5],[0.5,-0.5,-0.5],[0.5,0.5,-0.5],[0.5,0.5,0.5]] },
+        { n: [-1,0, 0], v: [[-0.5,-0.5,-0.5],[-0.5,-0.5,0.5],[-0.5,0.5,0.5],[-0.5,0.5,-0.5]] }
+      ];
+      const idx = [0,1,2,0,2,3];
+      for (const f of faces) {
+        for (const i of idx) {
+          p.push(f.v[i][0], f.v[i][1], f.v[i][2]);
+          n.push(f.n[0], f.n[1], f.n[2]);
+        }
+      }
+      return { p: new Float32Array(p), n: new Float32Array(n) };
+    }
+
+    function cylData(seg) {
+      const p = [];
+      const n = [];
+      const st = Math.PI * 2 / seg;
+      for (let i = 0; i < seg; i++) {
+        const a1 = i * st;
+        const a2 = (i + 1) * st;
+        const c1 = Math.cos(a1), s1 = Math.sin(a1);
+        const c2 = Math.cos(a2), s2 = Math.sin(a2);
+
+        p.push(c1*0.5,-0.5,s1*0.5, c2*0.5,-0.5,s2*0.5, c2*0.5,0.5,s2*0.5);
+        n.push(c1,0,s1, c2,0,s2, c2,0,s2);
+
+        p.push(c1*0.5,-0.5,s1*0.5, c2*0.5,0.5,s2*0.5, c1*0.5,0.5,s1*0.5);
+        n.push(c1,0,s1, c2,0,s2, c1,0,s1);
+
+        p.push(0,0.5,0, c1*0.5,0.5,s1*0.5, c2*0.5,0.5,s2*0.5);
+        n.push(0,1,0, 0,1,0, 0,1,0);
+
+        p.push(0,-0.5,0, c2*0.5,-0.5,s2*0.5, c1*0.5,-0.5,s1*0.5);
+        n.push(0,-1,0, 0,-1,0, 0,-1,0);
+      }
+      return { p: new Float32Array(p), n: new Float32Array(n), c: p.length / 3 };
+    }
+
+    function sphData(la, lo) {
+      const p = [];
+      const n = [];
+      for (let lat = 0; lat <= la; lat++) {
+        const th = lat * Math.PI / la;
+        const sT = Math.sin(th), cT = Math.cos(th);
+        for (let lon = 0; lon <= lo; lon++) {
+          const ph = lon * 2 * Math.PI / lo;
+          const sP = Math.sin(ph), cP = Math.cos(ph);
+          const x = cP * sT, y = cT, z = sP * sT;
+          p.push(x, y, z);
+          n.push(x, y, z);
+        }
+      }
+      const idx = [];
+      for (let lat = 0; lat < la; lat++) {
+        for (let lon = 0; lon < lo; lon++) {
+          const a = lat * (lo + 1) + lon;
+          const b = a + lo + 1;
+          idx.push(a, b, a + 1, b, b + 1, a + 1);
+        }
+      }
+      const fp = [], fn = [];
+      for (const i of idx) {
+        fp.push(p[i*3], p[i*3+1], p[i*3+2]);
+        fn.push(n[i*3], n[i*3+1], n[i*3+2]);
+      }
+      return { p: new Float32Array(fp), n: new Float32Array(fn), c: fp.length / 3 };
+    }
+
+    function triData() {
+      const w = 0.5, h = 1.0, d = 0.5;
+      const p = [], n = [];
+      function t(ax,ay,az,bx,by,bz,cx,cy,cz,nx,ny,nz) {
+        p.push(ax,ay,az,bx,by,bz,cx,cy,cz);
+        n.push(nx,ny,nz,nx,ny,nz,nx,ny,nz);
+      }
+      t(-w,0,d, w,0,d, 0,h,d, 0,0,1);
+      t(-w,0,-d, w,0,-d, 0,h,-d, 0,0,-1);
+      t(-w,0,-d, w,0,-d, w,0,d, 0,-1,0);
+      t(-w,0,-d, w,0,d, -w,0,d, 0,-1,0);
+      const rl = Math.sqrt(1.25), rx = 1/rl, ry = 0.5/rl;
+      t(w,0,-d, 0,h,-d, 0,h,d, rx,ry,0);
+      t(w,0,-d, 0,h,d, w,0,d, rx,ry,0);
+      t(0,h,-d, -w,0,-d, -w,0,d, -rx,ry,0);
+      t(0,h,-d, -w,0,d, 0,h,d, -rx,ry,0);
+      return { p: new Float32Array(p), n: new Float32Array(n), c: p.length / 3 };
+    }
+
+    const cube = cubeData();
+    const cyl = cylData(24);
+    const sph = sphData(12, 12);
+    const tri = triData();
+
+    const bufP = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, bufP);
+    gl.bufferData(gl.ARRAY_BUFFER, cube.p, gl.STATIC_DRAW);
+
+    const bufN = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, bufN);
+    gl.bufferData(gl.ARRAY_BUFFER, cube.n, gl.STATIC_DRAW);
+
+    const bufCP = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, bufCP);
+    gl.bufferData(gl.ARRAY_BUFFER, cyl.p, gl.STATIC_DRAW);
+
+    const bufCN = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, bufCN);
+    gl.bufferData(gl.ARRAY_BUFFER, cyl.n, gl.STATIC_DRAW);
+
+    const bufSP = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, bufSP);
+    gl.bufferData(gl.ARRAY_BUFFER, sph.p, gl.STATIC_DRAW);
+
+    const bufSN = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, bufSN);
+    gl.bufferData(gl.ARRAY_BUFFER, sph.n, gl.STATIC_DRAW);
+
+    const bufTP = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, bufTP);
+    gl.bufferData(gl.ARRAY_BUFFER, tri.p, gl.STATIC_DRAW);
+
+    const bufTN = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, bufTN);
+    gl.bufferData(gl.ARRAY_BUFFER, tri.n, gl.STATIC_DRAW);
+
+    const bufC = gl.createBuffer();
+    const colCache = {};
+
+    function setCol(r, g, b, a, count) {
+      if (a === undefined) a = 1.0;
+      count = count || 36;
+      let arr = colCache[count];
+      if (!arr) arr = colCache[count] = new Float32Array(count * 4);
+      for (let i = 0; i < count * 4; i += 4) {
+        arr[i] = r;
+        arr[i + 1] = g;
+        arr[i + 2] = b;
+        arr[i + 3] = a;
+      }
+      gl.bindBuffer(gl.ARRAY_BUFFER, bufC);
+      gl.bufferData(gl.ARRAY_BUFFER, arr, gl.DYNAMIC_DRAW);
+    }
+
+    function drawBox(tx, ty, tz, sx, sy, sz, ry, rx, rz) {
+      ry = fin(ry, 0); rx = fin(rx, 0); rz = fin(rz, 0);
+      tx = fin(tx, 0); ty = fin(ty, 0); tz = fin(tz, -1.0);
+      sx = fin(sx, 1); sy = fin(sy, 1); sz = fin(sz, 1);
+
+      const m = new Float32Array([1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1]);
+      m[12] = tx; m[13] = ty; m[14] = tz;
+
+      if (ry !== 0) {
+        const c = Math.cos(ry), s = Math.sin(ry);
+        m[0] = c; m[2] = s; m[8] = -s; m[10] = c;
+      }
+
+      if (rx !== 0) {
+        const c = Math.cos(rx), s = Math.sin(rx);
+        const m4=m[4],m5=m[5],m6=m[6],m7=m[7],m8=m[8],m9=m[9],m10=m[10],m11=m[11];
+        m[4]=m4*c+m8*s; m[5]=m5*c+m9*s; m[6]=m6*c+m10*s; m[7]=m7*c+m11*s;
+        m[8]=m8*c-m4*s; m[9]=m9*c-m5*s; m[10]=m10*c-m6*s; m[11]=m11*c-m7*s;
+      }
+
+      if (rz !== 0) {
+        const c = Math.cos(rz), s = Math.sin(rz);
+        const m0=m[0],m1=m[1],m4=m[4],m5=m[5];
+        m[0]=m0*c-m1*s; m[1]=m0*s+m1*c; m[4]=m4*c-m5*s; m[5]=m4*s+m5*c;
+      }
+
+      m[0]*=sx; m[1]*=sx; m[2]*=sx;
+      m[4]*=sy; m[5]*=sy; m[6]*=sy;
+      m[8]*=sz; m[9]*=sz; m[10]*=sz;
+
+      gl.uniformMatrix4fv(uModel, false, m);
+      gl.bindBuffer(gl.ARRAY_BUFFER, bufP);
+      gl.vertexAttribPointer(aPos, 3, gl.FLOAT, false, 0, 0);
+      gl.bindBuffer(gl.ARRAY_BUFFER, bufN);
+      gl.vertexAttribPointer(aNor, 3, gl.FLOAT, false, 0, 0);
+      gl.bindBuffer(gl.ARRAY_BUFFER, bufC);
+      gl.vertexAttribPointer(aCol, 4, gl.FLOAT, false, 0, 0);
+      gl.drawArrays(gl.TRIANGLES, 0, 36);
+    }
+
+    function drawCyl(tx, ty, tz, rad, h, ry, rx) {
+      ry = fin(ry, 0); rx = fin(rx, 0);
+      tx = fin(tx, 0); ty = fin(ty, 0); tz = fin(tz, -1.0);
+      rad = fin(rad, 0.1); h = fin(h, 0.1);
+
+      const m = new Float32Array([1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1]);
+      m[12] = tx; m[13] = ty; m[14] = tz;
+
+      if (ry !== 0) {
+        const c = Math.cos(ry), s = Math.sin(ry);
+        m[0] = c; m[2] = s; m[8] = -s; m[10] = c;
+      }
+
+      if (rx !== 0) {
+        const c = Math.cos(rx), s = Math.sin(rx);
+        const m4=m[4],m5=m[5],m6=m[6],m7=m[7],m8=m[8],m9=m[9],m10=m[10],m11=m[11];
+        m[4]=m4*c+m8*s; m[5]=m5*c+m9*s; m[6]=m6*c+m10*s; m[7]=m7*c+m11*s;
+        m[8]=m8*c-m4*s; m[9]=m9*c-m5*s; m[10]=m10*c-m6*s; m[11]=m11*c-m7*s;
+      }
+
+      const d = rad * 2.0;
+      m[0]*=d; m[1]*=d; m[2]*=d;
+      m[4]*=h; m[5]*=h; m[6]*=h;
+      m[8]*=d; m[9]*=d; m[10]*=d;
+
+      gl.uniformMatrix4fv(uModel, false, m);
+      gl.bindBuffer(gl.ARRAY_BUFFER, bufCP);
+      gl.vertexAttribPointer(aPos, 3, gl.FLOAT, false, 0, 0);
+      gl.bindBuffer(gl.ARRAY_BUFFER, bufCN);
+      gl.vertexAttribPointer(aNor, 3, gl.FLOAT, false, 0, 0);
+      gl.bindBuffer(gl.ARRAY_BUFFER, bufC);
+      gl.vertexAttribPointer(aCol, 4, gl.FLOAT, false, 0, 0);
+      gl.drawArrays(gl.TRIANGLES, 0, cyl.c);
+    }
+
+    function drawEll(tx, ty, tz, rx, ry, rz, vx, vy, vz) {
+      tx = fin(tx, 0); ty = fin(ty, 0); tz = fin(tz, 0);
+      rx = fin(rx, 0.1); ry = fin(ry, 0.1); rz = fin(rz, 0.1);
+      vx = fin(vx, 0); vy = fin(vy, 0); vz = fin(vz, 0);
+
+      const sp = Math.hypot(vx, vy, vz);
+      let yaw = 0, pitch = 0;
+      if (sp > 0.001) {
+        yaw = Math.atan2(vx, vz);
+        pitch = Math.asin(cl(-vy / sp, -1, 1));
+      }
+
+      const cy = Math.cos(yaw), sy = Math.sin(yaw);
+      const cp = Math.cos(pitch), spp = Math.sin(pitch);
+      const m = new Float32Array(16);
+
+      m[0] = cy * rx; m[1] = 0; m[2] = -sy * rx; m[3] = 0;
+      m[4] = sy * spp * ry; m[5] = cp * ry; m[6] = cy * spp * ry; m[7] = 0;
+      m[8] = sy * cp * rz; m[9] = -spp * rz; m[10] = cy * cp * rz; m[11] = 0;
+      m[12] = tx; m[13] = ty; m[14] = tz; m[15] = 1;
+
+      gl.uniformMatrix4fv(uModel, false, m);
+      gl.bindBuffer(gl.ARRAY_BUFFER, bufSP);
+      gl.vertexAttribPointer(aPos, 3, gl.FLOAT, false, 0, 0);
+      gl.bindBuffer(gl.ARRAY_BUFFER, bufSN);
+      gl.vertexAttribPointer(aNor, 3, gl.FLOAT, false, 0, 0);
+      gl.bindBuffer(gl.ARRAY_BUFFER, bufC);
+      gl.vertexAttribPointer(aCol, 4, gl.FLOAT, false, 0, 0);
+      gl.drawArrays(gl.TRIANGLES, 0, sph.c);
+    }
+
+    function drawTri(tx, ty, tz, sx, sy, sz, ry) {
+      ry = fin(ry, 0);
+      tx = fin(tx, 0); ty = fin(ty, 0); tz = fin(tz, -1.0);
+      sx = fin(sx, 1); sy = fin(sy, 1); sz = fin(sz, 1);
+
+      const m = new Float32Array([1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1]);
+      m[12] = tx; m[13] = ty; m[14] = tz;
+
+      if (ry !== 0) {
+        const c = Math.cos(ry), s = Math.sin(ry);
+        m[0] = c; m[2] = s; m[8] = -s; m[10] = c;
+      }
+
+      m[0]*=sx; m[1]*=sx; m[2]*=sx;
+      m[4]*=sy; m[5]*=sy; m[6]*=sy;
+      m[8]*=sz; m[9]*=sz; m[10]*=sz;
+
+      gl.uniformMatrix4fv(uModel, false, m);
+      gl.bindBuffer(gl.ARRAY_BUFFER, bufTP);
+      gl.vertexAttribPointer(aPos, 3, gl.FLOAT, false, 0, 0);
+      gl.bindBuffer(gl.ARRAY_BUFFER, bufTN);
+      gl.vertexAttribPointer(aNor, 3, gl.FLOAT, false, 0, 0);
+      gl.bindBuffer(gl.ARRAY_BUFFER, bufC);
+      gl.vertexAttribPointer(aCol, 4, gl.FLOAT, false, 0, 0);
+      gl.drawArrays(gl.TRIANGLES, 0, tri.c);
+    }
+
+    function b(x, y, z, sx, sy, sz, r, g, bl, ry, rx, rz) {
+      setCol(r, g, bl, 1.0, 36);
+      drawBox(x, y, z, sx, sy, sz, ry, rx, rz);
+    }
+
+    function y(x, z, rad, h, r, g, bl, ry, rx) {
+      setCol(r, g, bl, 1.0, cyl.c);
+      drawCyl(x, 0, z, rad, h, ry, rx);
+    }
+
+    function yc(x, y, z, rad, h, r, g, bl, ry, rx) {
+      setCol(r, g, bl, 1.0, cyl.c);
+      drawCyl(x, y, z, rad, h, ry, rx);
+    }
+
+    const AS = 130;
+    const HA = AS / 2;
+    const OBS = [];
+
+    function ob(x1, x2, y1, y2, z1, z2, t) {
+      OBS.push({ x1, x2, y1, y2, z1, z2, t: t || 'w' });
+    }
+
+    ob(-HA - 2, -HA, -10, 50, -HA, HA, 'b');
+    ob(HA, HA + 2, -10, 50, -HA, HA, 'b');
+    ob(-HA, HA, -10, 50, -HA - 2, -HA, 'b');
+    ob(-HA, HA, -10, 50, HA, HA + 2, 'b');
+
+    ob(-HA, HA, -2, 0, -HA, HA, 'd');
+    ob(-12, 12, 0, 1.5, -12, 12, 'hb');
+    ob(-10, 10, 1.5, 1.8, -10, 10, 'ht');
+
+    ob(-50, -40, 0, 6, -50, -40, 'tw');
+    ob(40, 50, 0, 6, -50, -40, 'tw');
+    ob(-50, -40, 0, 6, 40, 50, 'tw');
+    ob(40, 50, 0, 6, 40, 50, 'tw');
+
+    ob(-25, -22, 0, 3, -25, -22, 'cv');
+    ob(22, 25, 0, 3, -25, -22, 'cv');
+    ob(-25, -22, 0, 3, 22, 25, 'cv');
+    ob(22, 25, 0, 3, 22, 25, 'cv');
+
+    ob(-30, -28, 0, 8, 0, 2, 'py');
+    ob(28, 30, 0, 8, 0, 2, 'py');
+    ob(-1, 1, 0, 8, -30, -28, 'py');
+    ob(-1, 1, 0, 8, 28, 30, 'py');
+
+    ob(-15, -13, 0, 1.2, -35, -25, 'br');
+    ob(13, 15, 0, 1.2, -35, -25, 'br');
+    ob(-15, -13, 0, 1.2, 25, 35, 'br');
+    ob(13, 15, 0, 1.2, 25, 35, 'br');
+    ob(-35, -25, 0, 1.2, -15, -13, 'br');
+    ob(-35, -25, 0, 1.2, 13, 15, 'br');
+    ob(25, 35, 0, 1.2, -15, -13, 'br');
+    ob(25, 35, 0, 1.2, 13, 15, 'br');
+
+    const PADS = [
+      { x: -35, z: -35, r: 3.5 },
+      { x: 35, z: -35, r: 3.5 },
+      { x: -35, z: 35, r: 3.5 },
+      { x: 35, z: 35, r: 3.5 },
+      { x: 0, z: -42, r: 3.5 },
+      { x: 0, z: 42, r: 3.5 },
+      { x: -42, z: 0, r: 3.5 },
+      { x: 42, z: 0, r: 3.5 }
+    ];
+
+    let padCd = 0;
+
+    let run = false;
+    let wave = 1;
+    let score = 0;
+    let wPend = false;
+
+    const W = {
+      rifle: {
+        name: '1. ПЛАЗМЕННЫЙ КАРАБИН',
+        ammo: 30, max: 30, dmg: 1, rate: 0.14,
+        hip: 0.045, aim: 0.005, fov: 55,
+        col: [0.0, 1.0, 0.93], type: 'plasma_bolt'
+      },
+      pistol: {
+        name: '2. ТАКТИЧЕСКИЙ ПИСТОЛЕТ',
+        ammo: 12, max: 12, dmg: 2, rate: 0.25,
+        hip: 0.025, aim: 0.003, fov: 60,
+        col: [1.0, 0.55, 0.0], type: 'tracer'
+      },
+      shotgun: {
+        name: '3. ТАКТИЧЕСКИЙ ДРОБОВИК',
+        ammo: 6, max: 6, dmg: 1, rate: 0.72,
+        hip: 0.15, aim: 0.07, fov: 65,
+        col: [0.9, 0.1, 0.85], type: 'plasma_orb'
+      },
+      sniper: {
+        name: '4. РЕЙЛГАН-СНАЙПЕРКА',
+        ammo: 4, max: 4, dmg: 7, rate: 1.1,
+        hip: 0.18, aim: 0.0, fov: 18,
+        col: [0.3, 0.6, 1.0], type: 'beam'
+      },
+      railgun: {
+        name: '5. ТЯЖЁЛЫЙ РЕЛЬСОТРОН',
+        ammo: 3, max: 3, dmg: 12, rate: 1.35,
+        hip: 0.10, aim: 0.0, fov: 45,
+        col: [0.2, 0.8, 1.0], type: 'lightning_rail'
+      }
+    };
+
+    const RD = {
+      rifle: {
+        dur: 1.35,
+        st: [[0.10, 'rr0'], [0.26, 'rr1'], [0.52, 'rr2'], [0.74, 'rr3'], [0.91, 'rr4']]
+      },
+      pistol: {
+        dur: 1.05,
+        st: [[0.12, 'rp0'], [0.30, 'rp1'], [0.56, 'rp2'], [0.88, 'rp3']]
+      },
+      shotgun: {
+        dur: 1.80,
+        st: [[0.18, 'rs0'], [0.48, 'rs1'], [0.76, 'rs2'], [0.92, 'rs3']]
+      },
+      sniper: {
+        dur: 1.90,
+        st: [[0.16, 'rn0'], [0.40, 'rn1'], [0.64, 'rn2'], [0.88, 'rn3']]
+      },
+      railgun: {
+        dur: 2.10,
+        st: [[0.12, 'rg0'], [0.38, 'rg1'], [0.66, 'rg2'], [0.84, 'rg3']]
+      }
+    };
+
+    let cur = 'rifle';
+    let lastShot = 0;
+    let gran = 3;
+
+    let pump = 0.0;
+    let pumpS = [false, false];
+
+    let charging = false;
+    let charge = 0.0;
+    let throwP = 0.0;
+
+    let relP = 0.0;
+    let reloading = false;
+    let relDur = 1.35;
+    let relIdx = 0;
+
+    let dashCd = 0.0;
+    const DCD = 2.5;
+
+    let aiming = false;
+    let aimP = 0.0;
+
+    const P = {
+      x: 0, y: 2.0, z: 20,
+      vx: 0, vy: 0, vz: 0,
+      yaw: 0, pitch: 0,
+      r: 0.45, h: 1.7,
+      hp: 100, g: true
+    };
+
+    let rec = 0.0, recV = 0.0;
+    let pit = 0.0, pitV = 0.0;
+
+    const RS = 140.0;
+    const RDMP = 16.0;
+
+    const RP = {
+      rifle: { b: 1.05, u: 0.85 },
+      pistol: { b: 0.95, u: 1.25 },
+      shotgun: { b: 2.25, u: 1.70 },
+      sniper: { b: 2.05, u: 1.60 },
+      railgun: { b: 2.55, u: 1.90 }
+    };
+
+    let swX = 0.0, swY = 0.0;
+    let gsX = 0.0, gsY = 0.0;
+    let bob = 0.0;
+    let stT = 0.0;
+    let stN = 0;
+
+    const K = { w: false, a: false, s: false, d: false, sp: false, sh: false };
+
+    const B = [];
+    const EP = [];
+    const GR = [];
+    const MD = [];
+    const TR = [];
+    const PA = [];
+    const EN = [];
+
+    function handleKey(e, down) {
+      const c = e.code;
+      const k = e.key ? e.key.toLowerCase() : '';
+
+      if (c === 'KeyW' || c === 'ArrowUp' || k === 'w' || k === 'ц') K.w = down;
+      if (c === 'KeyS' || c === 'ArrowDown' || k === 's' || k === 'ы') K.s = down;
+      if (c === 'KeyA' || c === 'ArrowLeft' || k === 'a' || k === 'ф') K.a = down;
+      if (c === 'KeyD' || c === 'ArrowRight' || k === 'd' || k === 'в') K.d = down;
+      if (c === 'Space') K.sp = down;
+      if (c === 'ShiftLeft' || c === 'ShiftRight') K.sh = down;
+
+      if (down) {
+        if (c === 'Digit1') swW('rifle');
+        if (c === 'Digit2') swW('pistol');
+        if (c === 'Digit3') swW('shotgun');
+        if (c === 'Digit4') swW('sniper');
+        if (c === 'Digit5') swW('railgun');
+        if (c === 'KeyR') startRel();
+        if ((c === 'KeyE' || c === 'KeyF') && dashCd <= 0) doDash();
+
+        if (c === 'KeyG' && !charging && gran > 0) {
+          charging = true;
+          charge = 0.05;
+          document.getElementById('cw').style.display = 'flex';
+          snd('charge');
+        }
+      } else {
+        if (c === 'KeyG' && charging) releaseGran();
+      }
+    }
+
+    function swW(key) {
+      if (W[key] && !reloading && !charging) {
+        cur = key;
+        pump = 0.0;
+        hud();
+      }
+    }
+
+    function startRel() {
+      const w = W[cur];
+      if (reloading || charging || w.ammo === w.max) return;
+      reloading = true;
+      relP = 0.0;
+      relIdx = 0;
+      relDur = RD[cur].dur;
+      document.getElementById('ac').innerText = '--';
+    }
+
+    function doDash() {
+      dashCd = DCD;
+      snd('dash');
+
+      const fx = Math.sin(P.yaw);
+      const fz = -Math.cos(P.yaw);
+      const rx = Math.cos(P.yaw);
+      const rz = Math.sin(P.yaw);
+
+      let dx = 0, dz = 0;
+      if (K.w) { dx += fx; dz += fz; }
+      if (K.s) { dx -= fx; dz -= fz; }
+      if (K.a) { dx -= rx; dz -= rz; }
+      if (K.d) { dx += rx; dz += rz; }
+      if (dx === 0 && dz === 0) { dx = fx; dz = fz; }
+
+      const len = Math.hypot(dx, dz);
+      if (len > 0) {
+        P.vx += (dx / len) * 26.0;
+        P.vz += (dz / len) * 26.0;
+      }
+
+      for (let i = 0; i < 12; i++) {
+        PA.push({
+          x: P.x, y: P.y - 0.5, z: P.z,
+          vx: (Math.random() - 0.5) * 0.3,
+          vy: Math.random() * 0.2,
+          vz: (Math.random() - 0.5) * 0.3,
+          c: [0.0, 1.0, 0.93],
+          l: 14
+        });
+      }
+    }
+
+    window.addEventListener('keydown', function (e) { handleKey(e, true); });
+    window.addEventListener('keyup', function (e) { handleKey(e, false); });
+    window.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+
+    window.addEventListener('mousemove', function (e) {
+      if (!run) return;
+
+      const mult = aiming ? (cur === 'sniper' ? 0.35 : 0.6) : 1.0;
+      const sens = 0.0022 * mult;
+
+      P.yaw += e.movementX * sens;
+      P.pitch -= e.movementY * sens;
+      P.pitch = cl(P.pitch, -1.4, 1.4);
+
+      if (!aiming) {
+        swX += e.movementX * 0.0009;
+        swY += e.movementY * 0.0009;
+        swX = cl(swX, -0.06, 0.06);
+        swY = cl(swY, -0.05, 0.05);
+      }
+    });
+
+    window.addEventListener('mousedown', function (e) {
+      if (!run) return;
+      if (e.button === 0) shoot();
+      if (e.button === 2) aiming = true;
+    });
+
+    window.addEventListener('mouseup', function (e) {
+      if (!run) return;
+      if (e.button === 2) aiming = false;
+    });
+
+    function groundAt(px, pz, feet) {
+      let g = -100;
+      for (const o of OBS) {
+        if (px >= o.x1 - 0.15 && px <= o.x2 + 0.15 &&
+            pz >= o.z1 - 0.15 && pz <= o.z2 + 0.15) {
+          if (o.y2 <= feet + 0.38 && o.y2 > g) g = o.y2;
+        }
+      }
+      return g;
+    }
+
+    function surfH(x, z) {
+      let h = 0;
+      for (const o of OBS) {
+        if (x >= o.x1 && x <= o.x2 && z >= o.z1 && z <= o.z2 && o.y2 > h) h = o.y2;
+      }
+      return h;
+    }
+
+    function blocked(px, pz, feet) {
+      const bb = feet + 0.38;
+      const bt = feet + P.h;
+      for (const o of OBS) {
+        if (px + P.r > o.x1 && px - P.r < o.x2 &&
+            pz + P.r > o.z1 && pz - P.r < o.z2) {
+          if (bt > o.y1 && bb < o.y2) return true;
+        }
+      }
+      return false;
+    }
+
+    function inside(x, y, z, m) {
+      m = m || 0;
+      for (const o of OBS) {
+        if (x >= o.x1 - m && x <= o.x2 + m &&
+            y >= o.y1 - m && y <= o.y2 + m &&
+            z >= o.z1 - m && z <= o.z2 + m) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    const startBtn = document.getElementById('start');
+    const menu = document.getElementById('menu');
+
+    function startGame() {
+      initAudio();
+      run = true;
+      menu.style.display = 'none';
+
+      try {
+        const rq = cv.requestPointerLock || cv.mozRequestPointerLock;
+        if (rq) rq.call(cv);
+      } catch (e) {}
+
+      if (EN.length === 0) startWave(1);
+    }
+
+    startBtn.onclick = function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      startGame();
+    };
+
+    cv.onclick = function () {
+      if (run && document.pointerLockElement !== cv) {
+        try { cv.requestPointerLock(); } catch (e) {}
+      }
+    };
+
+    document.addEventListener('pointerlockchange', function () {
+      if (document.pointerLockElement !== cv && run) {
+        run = false;
+        aiming = false;
+        charging = false;
+        document.getElementById('cw').style.display = 'none';
+        menu.style.display = 'flex';
+        startBtn.innerText = 'ПРОДОЛЖИТЬ БОЙ';
+      }
+    });
+
+    function spawnMeds() {
+      MD.length = 0;
+      const sp = [[0,0],[0,-40],[0,40],[-33,0],[33,0],[-45,-45],[45,-45],[-45,45],[45,45]];
+      for (let i = 0; i < sp.length; i++) {
+        const x = sp[i][0], z = sp[i][1];
+        MD.push({ x: x, y: surfH(x, z) + 0.9, z: z, r: i * 0.7 });
+      }
+    }
+
+    function hitMark() {
+      const h = document.getElementById('hit');
+      h.style.opacity = '1';
+      snd('hit');
+      setTimeout(function () { h.style.opacity = '0'; }, 90);
+    }
+
+    function nextWave(delay) {
+      if (wPend) return;
+      wPend = true;
+      setTimeout(function () {
+        wPend = false;
+        startWave(wave + 1);
+      }, delay);
+    }
+
+    function shoot() {
+      const now = performance.now() / 1000;
+      const w = W[cur];
+
+      if (reloading || charging || throwP > 0) return;
+      if (now - lastShot < w.rate) return;
+      if (w.ammo <= 0) { startRel(); return; }
+
+      lastShot = now;
+      w.ammo--;
+
+      const prof = RP[cur] || RP.rifle;
+      recV += prof.b;
+      pitV += prof.u;
+
+      if (cur === 'shotgun') {
+        pump = 1.0;
+        pumpS = [false, false];
+      }
+
+      snd(cur);
+      hud();
+
+      const fx = Math.sin(P.yaw) * Math.cos(P.pitch);
+      const fy = Math.sin(P.pitch);
+      const fz = -Math.cos(P.yaw) * Math.cos(P.pitch);
+      const rx = Math.cos(P.yaw);
+      const rz = Math.sin(P.yaw);
+      const ux = -rz * fy;
+      const uy = Math.cos(P.pitch);
+      const uz = rx * fy;
+
+      let spread = aiming ? w.aim : w.hip;
+      if (!P.g) spread *= 1.8;
+
+      if (cur === 'shotgun') {
+        const baseSpeed = 1.9;
+
+        for (let i = 0; i < 6; i++) {
+          const sx = (Math.random() - 0.5) * spread;
+          const sy = (Math.random() - 0.5) * spread;
+          const px = fx + rx * sx + ux * sy;
+          const py = fy + uy * sy;
+          const pz = fz + rz * sx + uz * sy;
+          const len = Math.hypot(px, py, pz);
+
+          const speedVar = baseSpeed * (0.90 + Math.random() * 0.20);
+
+          B.push({
+            x: P.x + fx * 0.4,
+            y: P.y + fy * 0.4 - 0.05,
+            z: P.z + fz * 0.4,
+            vx: (px / len) * speedVar,
+            vy: (py / len) * speedVar,
+            vz: (pz / len) * speedVar,
+            d: w.dmg,
+            c: w.col,
+            t: 'plasma_orb',
+            s: 0.35,
+            l: 38
+          });
+        }
+      } else if (cur === 'railgun') {
+        const sp = 4.2;
+        B.push({
+          x: P.x + fx * 0.45,
+          y: P.y + fy * 0.45 - 0.04,
+          z: P.z + fz * 0.45,
+          px: P.x + fx * 0.45,
+          py: P.y + fy * 0.45 - 0.04,
+          pz: P.z + fz * 0.45,
+          vx: fx * sp,
+          vy: fy * sp,
+          vz: fz * sp,
+          d: w.dmg,
+          c: [0.95, 1.0, 1.0],
+          t: 'lightning_rail',
+          s: 0.38,
+          l: 90
+        });
+      } else {
+        const sx = (Math.random() - 0.5) * spread;
+        const sy = (Math.random() - 0.5) * spread;
+        const px = fx + rx * sx + ux * sy;
+        const py = fy + uy * sy;
+        const pz = fz + rz * sx + uz * sy;
+        const len = Math.hypot(px, py, pz);
+        const sp = cur === 'sniper' ? 3.4 : (cur === 'pistol' ? 2.1 : 1.8);
+
+        B.push({
+          x: P.x + fx * 0.4,
+          y: P.y + fy * 0.4 - 0.05,
+          z: P.z + fz * 0.4,
+          vx: (px / len) * sp,
+          vy: (py / len) * sp,
+          vz: (pz / len) * sp,
+          d: w.dmg,
+          c: w.col,
+          t: w.type,
+          s: cur === 'sniper' ? 0.38 : 0.30,
+          l: cur === 'sniper' ? 80 : 55
+        });
+      }
+    }
+
+    function releaseGran() {
+      if (gran <= 0 || !charging) return;
+
+      charging = false;
+      document.getElementById('cw').style.display = 'none';
+      gran--;
+      hud();
+      snd('throw');
+      throwP = 1.0;
+
+      const fx = Math.sin(P.yaw) * Math.cos(P.pitch);
+      const fy = Math.sin(P.pitch);
+      const fz = -Math.cos(P.yaw) * Math.cos(P.pitch);
+      const force = 8.0 + 22.0 * charge;
+
+      GR.push({
+        x: P.x + fx * 0.5,
+        y: P.y + 0.1,
+        z: P.z + fz * 0.5,
+        vx: fx * force,
+        vy: fy * force + 2.5 + 4.5 * charge,
+        vz: fz * force,
+        t: 1.8,
+        r: 0
+      });
+
+      charge = 0.0;
+    }
+
+    function safeSpawn() {
+      const rad = HA - 10.0;
+      for (let i = 0; i < 80; i++) {
+        const x = (Math.random() * 2 - 1) * rad;
+        const z = (Math.random() * 2 - 1) * rad;
+        if (Math.hypot(x - P.x, z - P.z) < 20) continue;
+        if (!inside(x, 1.5, z, 1.0)) return { x: x, y: 1.5, z: z };
+      }
+
+      const a = Math.random() * Math.PI * 2;
+      const d = 30 + Math.random() * 25;
+      return { x: Math.cos(a) * d, y: 1.5, z: Math.sin(a) * d };
+    }
+
+    function spawnEnemy() {
+      const p = safeSpawn();
+      const r = Math.random();
+
+      let type = 'stalker';
+      let hp = 3, max = 3, sp = 4.4, size = 1.0;
+
+      if (r < 0.28) { type = 'goliath'; hp = 7; max = 7; sp = 2.0; size = 1.6; }
+      else if (r > 0.65) { type = 'viper'; hp = 2; max = 2; sp = 6.4; size = 0.8; }
+
+      EN.push({
+        type: type,
+        x: p.x, y: p.y, z: p.z,
+        vx: 0, vy: 0, vz: 0,
+        hp: hp, max: max,
+        sp: sp, size: size,
+        sc: 1.5 + Math.random() * 2.0,
+        r: 0,
+        at: 0, ax: 0, az: 0, side: 0,
+        st: 0, lx: p.x, lz: p.z,
+        kb: 0
+      });
+
+      hud();
+    }
+
+    function startWave(w) {
+      wave = w;
+      gran = 3;
+      wPend = false;
+      spawnMeds();
+      document.getElementById('wv').innerText = wave;
+
+      const count = 4 + wave * 3;
+      let spawned = 0;
+
+      function next() {
+        if (spawned >= count) return;
+        if (run) {
+          spawnEnemy();
+          spawned++;
+        }
+        setTimeout(next, 420);
+      }
+
+      next();
+      hud();
+    }
+
+    function boom(x, y, z, c, n) {
+      c = c || [1.0, 0.0, 0.33];
+      n = n || 16;
+      for (let i = 0; i < n; i++) {
+        PA.push({
+          x: x, y: y, z: z,
+          vx: (Math.random() - 0.5) * 0.45,
+          vy: (Math.random() - 0.2) * 0.45,
+          vz: (Math.random() - 0.5) * 0.45,
+          c: c,
+          l: 25
+        });
+      }
+    }
+
+    function damage(d) {
+      if (d <= 0) return;
+      P.hp = Math.max(0, P.hp - d);
+      snd('hurt');
+      hud();
+
+      const f = document.getElementById('dm');
+      f.style.opacity = '1';
+      setTimeout(function () { f.style.opacity = '0'; }, 100);
+
+      if (P.hp <= 0) {
+        alert('КРИТИЧЕСКИЙ СБОЙ! БРОНЯ УНИЧТОЖЕНА.');
+        location.reload();
+      }
+    }
+
+    function hud() {
+      const w = W[cur];
+      document.getElementById('hv').innerText = Math.round(P.hp);
+      document.getElementById('hpf').style.width = P.hp + '%';
+      document.getElementById('wnd').innerText = w.name;
+      if (!reloading) document.getElementById('ac').innerText = w.ammo;
+      document.getElementById('am').innerText = ' / ' + w.max;
+      document.getElementById('gv').innerText = gran;
+      document.getElementById('sv').innerText = score;
+      document.getElementById('ev').innerText = EN.length;
+    }
+
+    const rcv = document.getElementById('rc');
+    const rctx = rcv.getContext('2d');
+
+    function radar() {
+      rctx.clearRect(0, 0, 120, 120);
+      const cx = 60, cy = 60, r = 54;
+
+      rctx.strokeStyle = 'rgba(255,0,255,0.35)';
+      rctx.beginPath();
+      rctx.arc(cx, cy, r, 0, Math.PI * 2);
+      rctx.arc(cx, cy, r * 0.5, 0, Math.PI * 2);
+      rctx.stroke();
+
+      rctx.fillStyle = '#00ffff';
+      rctx.fillRect(cx - 2, cy - 2, 4, 4);
+
+      function dot(wx, wz, col, sz) {
+        const dx = wx - P.x;
+        const dz = wz - P.z;
+        const co = Math.cos(-P.yaw);
+        const si = Math.sin(-P.yaw);
+        const rx = dx * co - dz * si;
+        const ry = dx * si + dz * co;
+        const sx = cx + (rx / 65) * r;
+        const sy = cy + (ry / 65) * r;
+        if (Math.hypot(sx - cx, sy - cy) < r) {
+          rctx.fillStyle = col;
+          rctx.beginPath();
+          rctx.arc(sx, sy, sz, 0, Math.PI * 2);
+          rctx.fill();
+        }
+      }
+
+      PADS.forEach(function (p) { dot(p.x, p.z, '#00ff88', 3.0); });
+      MD.forEach(function (m) { dot(m.x, m.z, '#00ff66', 3.5); });
+      EN.forEach(function (e) {
+        const col = e.type === 'goliath' ? '#ffd700' : (e.type === 'viper' ? '#cc00ff' : '#ff0055');
+        dot(e.x, e.z, col, e.type === 'goliath' ? 4.5 : 3.0);
+      });
+    }
+
+    const VM = {
+      rifle: { hx: 0.23, hy: -0.26, hz: -0.72, ax: 0.00, ay: -0.17, az: -0.54 },
+      pistol: { hx: 0.20, hy: -0.25, hz: -0.64, ax: 0.00, ay: -0.16, az: -0.48 },
+      shotgun: { hx: 0.24, hy: -0.28, hz: -0.74, ax: 0.00, ay: -0.19, az: -0.56 },
+      sniper: { hx: 0.26, hy: -0.30, hz: -0.82, ax: 0.00, ay: -0.10, az: -0.62 },
+      railgun: { hx: 0.28, hy: -0.30, hz: -0.78, ax: 0.00, ay: -0.19, az: -0.60 }
+    };
+
+    const IDENT = new Float32Array([1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1]);
+
+    function renderVM(now, asp) {
+      gl.disable(gl.BLEND);
+      gl.depthMask(true);
+      gl.clear(gl.DEPTH_BUFFER_BIT);
+
+      const fov = 60 * Math.PI / 180;
+      const f = 1.0 / Math.tan(fov / 2);
+      const nr = 0.01;
+      const fr = 10.0;
+      const nf = 1 / (nr - fr);
+
+      gl.uniformMatrix4fv(uProj, false, new Float32Array([
+        f / asp, 0, 0, 0,
+        0, f, 0, 0,
+        0, 0, (fr + nr) * nf, -1,
+        0, 0, 2 * fr * nr * nf, 0
+      ]));
+
+      gl.uniformMatrix4fv(uView, false, IDENT);
+      gl.uniform1i(uVM, 1);
+
+      let rdY = 0, rdZ = 0, rr = 0, rp = 0;
+      let slide = 0, bolt = 0, cell = 0, batt = 0, vent = 0, shell = 0, magGlow = 0;
+      let magHand = 0, reloadPump = 0;
+
+      if (reloading) {
+        const p = cl(fin(relP, 0), 0, 1);
+
+        if (cur === 'rifle') {
+          const s = Math.sin(Math.min(1, p / 0.90) * Math.PI);
+          rdY = -0.20 * s;
+          rdZ = 0.10 * s;
+          rr = -0.40 * s;
+          rp = -0.18 * s;
+          bolt = (p > 0.74 && p < 0.92) ? Math.sin((p - 0.74) / 0.18 * Math.PI) : 0;
+          magHand = (p > 0.28 && p < 0.72) ? 1 : 0;
+        } else if (cur === 'pistol') {
+          const s = Math.sin(Math.min(1, p / 0.88) * Math.PI);
+          rdY = -0.16 * s;
+          rdZ = 0.07 * s;
+          rr = -0.60 * s;
+          rp = -0.45 * s;
+          if (p > 0.18 && p < 0.88) slide = 1;
+          else if (p >= 0.88) slide = Math.max(0, 1 - (p - 0.88) / 0.10);
+          else slide = 0;
+          magHand = (p > 0.30 && p < 0.75) ? 1 : 0;
+        } else if (cur === 'shotgun') {
+          const s = Math.sin(Math.min(1, p / 0.92) * Math.PI);
+          rdY = -0.12 * s;
+          rdZ = 0.08 * s;
+          rr = 0.50 * s;
+          rp = -0.12 * s;
+          shell = (p > 0.08 && p < 0.72) ? 1 : 0;
+          reloadPump = (p > 0.74 && p < 0.96) ? Math.sin((p - 0.74) / 0.22 * Math.PI) : 0;
+        } else if (cur === 'sniper') {
+          const s = Math.sin(Math.min(1, p / 0.92) * Math.PI);
+          rdY = -0.24 * s;
+          rdZ = 0.12 * s;
+          rr = 0.35 * s;
+          rp = -0.38 * s;
+          if (p > 0.14 && p < 0.38) bolt = Math.sin((p - 0.14) / 0.24 * Math.PI);
+          else if (p > 0.76 && p < 0.96) bolt = 1 - Math.sin((p - 0.76) / 0.20 * Math.PI);
+          else bolt = 0;
+          cell = (p > 0.38 && p < 0.76) ? Math.sin((p - 0.38) / 0.38 * Math.PI) : 0;
+          magHand = cell > 0.08 ? 1 : 0;
+        } else {
+          const s = Math.sin(Math.min(1, p / 0.92) * Math.PI);
+          rdY = -0.26 * s;
+          rdZ = 0.14 * s;
+          rr = 0.55 * s;
+          rp = 0.25 * s;
+          vent = (p > 0.08 && p < 0.36) ? Math.sin((p - 0.08) / 0.28 * Math.PI) : 0;
+          batt = (p > 0.30 && p < 0.80) ? Math.sin((p - 0.30) / 0.50 * Math.PI) : 0;
+          magGlow = (p > 0.80) ? Math.sin((p - 0.80) / 0.20 * Math.PI) : 0;
+          magHand = (p > 0.45 && p < 0.80) ? 1 : 0;
+        }
+      }
+
+      rdY = fin(rdY, 0); rdZ = fin(rdZ, 0); rr = fin(rr, 0); rp = fin(rp, 0);
+      slide = fin(slide, 0); bolt = fin(bolt, 0); cell = fin(cell, 0);
+      batt = fin(batt, 0); vent = fin(vent, 0); shell = fin(shell, 0);
+      magGlow = fin(magGlow, 0); magHand = fin(magHand, 0); reloadPump = fin(reloadPump, 0);
+
+      let holster = 0;
+      if (charging) holster = -0.65;
+      else if (throwP > 0) holster = -0.65 * throwP;
+      holster = fin(holster, 0);
+
+      const hide = (cur === 'sniper' && aimP > 0.85);
+      const canGun = !hide && holster > -0.60;
+
+      if (canGun) {
+        const cfg = VM[cur];
+        const bm = (1.0 - aimP) * (reloading ? 0.25 : 1.0);
+        const ba = K.sh ? 1.35 : 1.0;
+        const br = Math.sin(now * 0.0025) * (aiming ? 0.006 : 0.004);
+
+        const bx = (Math.cos(bob * 0.5) * 0.016 * ba - gsX) * bm;
+        const by = (Math.sin(bob) * 0.012 * ba - gsY) * bm + br * (reloading ? 0.25 : 1.0);
+
+        const hipY = cfg.hy + rdY + holster;
+        const hipZ = cfg.hz + rdZ;
+
+        let gx = cfg.hx + (cfg.ax - cfg.hx) * aimP + bx;
+        let gy = hipY + (cfg.ay - hipY) * aimP + by + pit * 0.18;
+        let gz = hipZ + (cfg.az - hipZ) * aimP + rec * 0.22;
+        let grx = pit * 0.40 + rp;
+        let grz = rr;
+
+        gx = fin(gx, cfg.hx);
+        gy = fin(gy, hipY);
+        gz = fin(gz, hipZ);
+        grx = fin(grx, 0);
+        grz = fin(grz, 0);
+
+        if (gz > -0.50) gz = -0.50;
+
+        const np = 0.7 + Math.sin(now * 0.008) * 0.3;
+
+        b(gx + 0.13, gy - 0.34, gz + 0.34, 0.10, 0.11, 0.32, 0.16, 0.18, 0.24, 0, grx + 0.35, grz - 0.12);
+        b(gx + 0.09, gy - 0.26, gz + 0.16, 0.09, 0.09, 0.12, 0.20, 0.24, 0.32, 0, grx + 0.20, grz);
+
+        if (cur === 'rifle') {
+          b(gx, gy, gz, 0.12, 0.15, 0.58, 0.10, 0.13, 0.18, 0, grx, grz);
+          b(gx, gy + 0.075, gz - 0.05, 0.10, 0.05, 0.44, 0.13, 0.16, 0.22, 0, grx - 0.12, grz);
+          b(gx, gy - 0.075, gz - 0.02, 0.10, 0.05, 0.40, 0.08, 0.10, 0.14, 0, grx + 0.10, grz);
+          b(gx, gy + 0.10, gz - 0.02, 0.07, 0.03, 0.40, 0.06, 0.08, 0.12, 0, grx, grz);
+          b(gx, gy + 0.115, gz - 0.12, 0.075, 0.02, 0.03, 0.04, 0.05, 0.08, 0, grx, grz);
+          b(gx, gy + 0.115, gz - 0.02, 0.075, 0.02, 0.03, 0.04, 0.05, 0.08, 0, grx, grz);
+          b(gx, gy + 0.115, gz + 0.08, 0.075, 0.02, 0.03, 0.04, 0.05, 0.08, 0, grx, grz);
+
+          b(gx - 0.065, gy + 0.01, gz - 0.30, 0.012, 0.03, 0.34, 0.0, np, np * 0.9, 0, grx, grz);
+          b(gx + 0.065, gy + 0.01, gz - 0.30, 0.012, 0.03, 0.34, 0.0, np, np * 0.9, 0, grx, grz);
+          b(gx, gy + 0.055, gz - 0.30, 0.02, 0.012, 0.30, 0.0, np, np * 0.9, 0, grx, grz);
+
+          b(gx, gy + 0.01, gz - 0.42, 0.07, 0.07, 0.26, 0.10, 0.13, 0.18, 0, grx, grz);
+          b(gx, gy + 0.01, gz - 0.58, 0.09, 0.09, 0.10, 0.06, 0.08, 0.12, 0, grx, grz);
+          b(gx, gy + 0.01, gz - 0.635, 0.05, 0.05, 0.02, 0.0, 1.0, 0.93, 0, grx, grz);
+
+          const showMag = !reloading || relP < 0.25 || relP > 0.72;
+          if (showMag) {
+            b(gx, gy - 0.13, gz - 0.04, 0.06, 0.16, 0.10, 0.18, 0.22, 0.30, 0, grx + 0.18, grz);
+            b(gx, gy - 0.16, gz - 0.06, 0.062, 0.02, 0.06, 0.0, 0.8, 0.75, 0, grx + 0.18, grz);
+          }
+
+          b(gx, gy - 0.10, gz - 0.30, 0.05, 0.12, 0.07, 0.08, 0.10, 0.14, 0, grx - 0.15, grz);
+          b(gx + 0.07, gy + 0.02, gz + 0.10 + bolt * 0.12, 0.03, 0.03, 0.08, 0.20, 0.24, 0.30, 0, grx, grz);
+
+          const sx = gx, sy = gy + 0.14, sz = gz - 0.02;
+          b(sx - 0.045, sy, sz, 0.015, 0.08, 0.09, 0.06, 0.08, 0.12, 0, grx, grz);
+          b(sx + 0.045, sy, sz, 0.015, 0.08, 0.09, 0.06, 0.08, 0.12, 0, grx, grz);
+          b(sx, sy + 0.045, sz, 0.105, 0.015, 0.09, 0.06, 0.08, 0.12, 0, grx, grz);
+          b(sx, sy, sz, 0.010, 0.010, 0.010, 0.0, 1.0, 0.93, 0, grx, grz);
+          b(sx - 0.022, sy, sz, 0.006, 0.016, 0.006, 0.0, 1.0, 0.93, 0, grx, grz);
+          b(sx + 0.022, sy, sz, 0.006, 0.016, 0.006, 0.0, 1.0, 0.93, 0, grx, grz);
+          b(sx, sy + 0.022, sz, 0.016, 0.006, 0.006, 0.0, 1.0, 0.93, 0, grx, grz);
+        } else if (cur === 'pistol') {
+          const off = slide * 0.07;
+          b(gx, gy + 0.02, gz + off, 0.07, 0.075, 0.34, 0.12, 0.14, 0.18, 0, grx, grz);
+          b(gx, gy + 0.02, gz + 0.09 + off, 0.074, 0.078, 0.015, 0.08, 0.10, 0.14, 0, grx, grz);
+          b(gx, gy + 0.02, gz + 0.12 + off, 0.074, 0.078, 0.015, 0.08, 0.10, 0.14, 0, grx, grz);
+          b(gx, gy + 0.02, gz + 0.15 + off, 0.074, 0.078, 0.015, 0.08, 0.10, 0.14, 0, grx, grz);
+          b(gx, gy + 0.06, gz - 0.02 + off, 0.06, 0.02, 0.28, 0.16, 0.20, 0.26, 0, grx, grz);
+          b(gx, gy - 0.03, gz - 0.02, 0.065, 0.045, 0.30, 0.14, 0.17, 0.22, 0, grx, grz);
+          b(gx, gy - 0.13, gz + 0.10, 0.058, 0.17, 0.09, 0.10, 0.12, 0.16, 0, grx + 0.25, grz);
+          b(gx, gy - 0.10, gz + 0.075, 0.062, 0.02, 0.02, 0.08, 0.10, 0.14, 0, grx + 0.25, grz);
+          b(gx, gy - 0.14, gz + 0.09, 0.062, 0.02, 0.02, 0.08, 0.10, 0.14, 0, grx + 0.25, grz);
+          b(gx, gy - 0.18, gz + 0.105, 0.062, 0.02, 0.02, 0.08, 0.10, 0.14, 0, grx + 0.25, grz);
+          b(gx, gy - 0.065, gz - 0.16, 0.05, 0.035, 0.10, 0.06, 0.08, 0.12, 0, grx, grz);
+          b(gx, gy - 0.065, gz - 0.215, 0.015, 0.015, 0.015, 1.0, 0.10, 0.10, 0, grx, grz);
+          b(gx, gy + 0.02, gz - 0.19, 0.04, 0.04, 0.06, 0.10, 0.12, 0.16, 0, grx, grz);
+          b(gx, gy + 0.065, gz - 0.17, 0.012, 0.015, 0.012, 0.0, 1.0, 0.40, 0, grx, grz);
+          b(gx - 0.02, gy + 0.065, gz + 0.14, 0.010, 0.015, 0.012, 0.0, 1.0, 0.40, 0, grx, grz);
+          b(gx + 0.02, gy + 0.065, gz + 0.14, 0.010, 0.015, 0.012, 0.0, 1.0, 0.40, 0, grx, grz);
+        } else if (cur === 'shotgun') {
+          const po = Math.sin(pump * Math.PI) * 0.12 + reloadPump * 0.14;
+          b(gx, gy, gz, 0.13, 0.15, 0.54, 0.12, 0.14, 0.19, 0, grx, grz);
+          b(gx, gy + 0.03, gz - 0.36, 0.11, 0.10, 0.30, 0.10, 0.12, 0.16, 0, grx, grz);
+          b(gx - 0.056, gy + 0.03, gz - 0.28, 0.005, 0.05, 0.05, 0.04, 0.05, 0.07, 0, grx, grz);
+          b(gx - 0.056, gy + 0.03, gz - 0.38, 0.005, 0.05, 0.05, 0.04, 0.05, 0.07, 0, grx, grz);
+          b(gx + 0.056, gy + 0.03, gz - 0.28, 0.005, 0.05, 0.05, 0.04, 0.05, 0.07, 0, grx, grz);
+          b(gx + 0.056, gy + 0.03, gz - 0.38, 0.005, 0.05, 0.05, 0.04, 0.05, 0.07, 0, grx, grz);
+
+          yc(gx - 0.035, gy - 0.055, gz - 0.30, 0.030, 0.34, 0.14, 0.16, 0.21, 0, grx + 1.57);
+          yc(gx + 0.035, gy - 0.055, gz - 0.30, 0.030, 0.34, 0.14, 0.16, 0.21, 0, grx + 1.57);
+          yc(gx - 0.035, gy - 0.055, gz - 0.475, 0.032, 0.03, 1.0, 0.45, 0.0, 0, grx + 1.57);
+          yc(gx + 0.035, gy - 0.055, gz - 0.475, 0.032, 0.03, 1.0, 0.45, 0.0, 0, grx + 1.57);
+          yc(gx, gy + 0.03, gz - 0.55, 0.035, 0.10, 0.08, 0.10, 0.13, 0, grx + 1.57);
+
+          b(gx, gy - 0.02, gz - 0.30 + po, 0.115, 0.09, 0.20, 0.18, 0.22, 0.30, 0, grx, grz);
+          b(gx, gy - 0.02, gz - 0.24 + po, 0.12, 0.03, 0.03, 1.0, 0.45, 0.0, 0, grx, grz);
+          b(gx, gy - 0.02, gz - 0.36 + po, 0.12, 0.03, 0.03, 1.0, 0.45, 0.0, 0, grx, grz);
+          b(gx, gy - 0.13, gz + 0.16, 0.06, 0.16, 0.09, 0.10, 0.12, 0.16, 0, grx + 0.25, grz);
+          b(gx, gy - 0.02, gz + 0.34, 0.07, 0.12, 0.20, 0.12, 0.14, 0.18, 0, grx - 0.10, grz);
+          b(gx, gy + 0.09, gz - 0.10, 0.06, 0.025, 0.30, 0.06, 0.08, 0.11, 0, grx, grz);
+          b(gx, gy + 0.105, gz - 0.50, 0.012, 0.02, 0.02, 0.0, 1.0, 0.30, 0, grx, grz);
+        } else if (cur === 'sniper') {
+          b(gx, gy, gz, 0.11, 0.15, 0.72, 0.09, 0.11, 0.16, 0, grx, grz);
+          yc(gx, gy + 0.02, gz - 0.60, 0.030, 0.50, 0.12, 0.14, 0.19, 0, grx + 1.57);
+          yc(gx, gy + 0.02, gz - 0.42, 0.042, 0.03, 0.18, 0.21, 0.27, 0, grx + 1.57);
+          yc(gx, gy + 0.02, gz - 0.52, 0.042, 0.03, 0.18, 0.21, 0.27, 0, grx + 1.57);
+          yc(gx, gy + 0.02, gz - 0.62, 0.042, 0.03, 0.18, 0.21, 0.27, 0, grx + 1.57);
+          yc(gx, gy + 0.02, gz - 0.72, 0.042, 0.03, 0.18, 0.21, 0.27, 0, grx + 1.57);
+          yc(gx, gy + 0.02, gz - 0.86, 0.045, 0.12, 0.08, 0.10, 0.14, 0, grx + 1.57);
+
+          b(gx - 0.05, gy - 0.14, gz - 0.55, 0.02, 0.22, 0.03, 0.10, 0.12, 0.16, 0, grx, grz + 0.35);
+          b(gx + 0.05, gy - 0.14, gz - 0.55, 0.02, 0.22, 0.03, 0.10, 0.12, 0.16, 0, grx, grz - 0.35);
+          b(gx - 0.09, gy - 0.24, gz - 0.55, 0.03, 0.02, 0.06, 0.06, 0.08, 0.11, 0, grx, grz + 0.35);
+          b(gx + 0.09, gy - 0.24, gz - 0.55, 0.03, 0.02, 0.06, 0.06, 0.08, 0.11, 0, grx, grz - 0.35);
+
+          yc(gx, gy + 0.16, gz - 0.02, 0.055, 0.34, 0.08, 0.10, 0.14, 0, grx + 1.57);
+          yc(gx, gy + 0.16, gz - 0.20, 0.065, 0.08, 0.10, 0.12, 0.16, 0, grx + 1.57);
+          yc(gx, gy + 0.16, gz + 0.14, 0.065, 0.06, 0.10, 0.12, 0.16, 0, grx + 1.57);
+          yc(gx, gy + 0.16, gz - 0.245, 0.055, 0.012, 0.2, 0.6, 1.0, 0, grx + 1.57);
+          yc(gx, gy + 0.16, gz + 0.175, 0.055, 0.012, 0.4, 0.8, 1.0, 0, grx + 1.57);
+
+          b(gx, gy + 0.10, gz - 0.10, 0.03, 0.06, 0.05, 0.06, 0.08, 0.12, 0, grx, grz);
+          b(gx, gy + 0.10, gz + 0.08, 0.03, 0.06, 0.05, 0.06, 0.08, 0.12, 0, grx, grz);
+          b(gx + 0.07, gy + 0.02, gz + 0.10 + bolt * 0.16, 0.03, 0.03, 0.10, 0.14, 0.17, 0.22, 0, grx, grz);
+
+          if (cell > 0.05) {
+            b(gx - 0.10, gy + 0.02 - cell * 0.06, gz + 0.05 + cell * 0.10, 0.04, 0.10, 0.06, 0.2, 0.6, 1.0, 0, grx, grz);
+          }
+
+          b(gx, gy - 0.02, gz + 0.44, 0.08, 0.14, 0.24, 0.10, 0.12, 0.16, 0, grx - 0.08, grz);
+          b(gx, gy - 0.13, gz + 0.16, 0.055, 0.16, 0.08, 0.09, 0.11, 0.15, 0, grx + 0.25, grz);
+        } else if (cur === 'railgun') {
+          b(gx, gy, gz, 0.16, 0.18, 0.65, 0.10, 0.13, 0.18, 0, grx, grz);
+          b(gx - 0.10, gy + 0.02, gz - 0.45, 0.05, 0.10, 0.60, 0.14, 0.18, 0.26, 0, grx, grz);
+          b(gx + 0.10, gy + 0.02, gz - 0.45, 0.05, 0.10, 0.60, 0.14, 0.18, 0.26, 0, grx, grz);
+
+          const railPulse = 0.6 + Math.sin(now * 0.010) * 0.4 + magGlow * 0.6;
+          b(gx - 0.072, gy + 0.02, gz - 0.45, 0.008, 0.06, 0.55,
+            cl(0.2 * railPulse, 0, 1), cl(0.8 * railPulse, 0, 1), cl(railPulse, 0, 1), 0, grx, grz);
+          b(gx + 0.072, gy + 0.02, gz - 0.45, 0.008, 0.06, 0.55,
+            cl(0.2 * railPulse, 0, 1), cl(0.8 * railPulse, 0, 1), cl(railPulse, 0, 1), 0, grx, grz);
+
+          b(gx - 0.115, gy + 0.02, gz - 0.25, 0.08, 0.13, 0.05, 0.10, 0.14, 0.20, 0, grx, grz);
+          b(gx + 0.115, gy + 0.02, gz - 0.25, 0.08, 0.13, 0.05, 0.10, 0.14, 0.20, 0, grx, grz);
+          b(gx - 0.115, gy + 0.02, gz - 0.55, 0.08, 0.13, 0.05, 0.10, 0.14, 0.20, 0, grx, grz);
+          b(gx + 0.115, gy + 0.02, gz - 0.55, 0.08, 0.13, 0.05, 0.10, 0.14, 0.20, 0, grx, grz);
+
+          yc(gx, gy + 0.02, gz - 0.10, 0.055, 0.22, 0.08, 0.10, 0.15, 0, grx + 1.57);
+
+          if (batt < 0.5) {
+            const ap = 0.5 + Math.sin(now * 0.007) * 0.5;
+            yc(gx, gy + 0.02, gz - 0.10, 0.040, 0.24,
+              cl(0.2 + 0.6 * ap, 0, 1), cl(0.7 + 0.3 * ap, 0, 1), 1.0, 0, grx + 1.57);
+          } else {
+            b(gx - 0.12, gy - 0.05, gz + 0.05 + (1 - batt) * 0.10, 0.05, 0.12, 0.07, 0.2, 0.7, 1.0, 0, grx, grz);
+          }
+
+          yc(gx, gy + 0.02, gz - 0.225, 0.06, 0.03, 0.10, 0.14, 0.20, 0, grx + 1.57);
+          yc(gx, gy + 0.02, gz + 0.025, 0.06, 0.03, 0.10, 0.14, 0.20, 0, grx + 1.57);
+
+          if (vent > 0.05) {
+            setCol(0.7, 0.9, 1.0, vent * 0.5, 36);
+            drawBox(gx - 0.13, gy + 0.06 + vent * 0.05, gz - 0.30, 0.03, 0.05, 0.10, 0, grx, grz);
+            drawBox(gx + 0.13, gy + 0.06 + vent * 0.05, gz - 0.30, 0.03, 0.05, 0.10, 0, grx, grz);
+          }
+
+          b(gx - 0.09, gy - 0.06, gz + 0.10, 0.02, 0.02, 0.22, 0.05, 0.06, 0.09, 0, grx + 0.30, grz);
+          b(gx + 0.09, gy - 0.06, gz + 0.10, 0.02, 0.02, 0.22, 0.05, 0.06, 0.09, 0, grx - 0.30, grz);
+          b(gx - 0.07, gy + 0.10, gz + 0.16, 0.015, 0.015, 0.18, 0.05, 0.06, 0.09, 0, grx - 0.40, grz);
+          b(gx + 0.07, gy + 0.10, gz + 0.16, 0.015, 0.015, 0.18, 0.05, 0.06, 0.09, 0, grx + 0.40, grz);
+          b(gx, gy - 0.14, gz + 0.18, 0.06, 0.17, 0.09, 0.10, 0.13, 0.18, 0, grx + 0.25, grz);
+          b(gx, gy - 0.02, gz + 0.38, 0.10, 0.14, 0.20, 0.12, 0.15, 0.20, 0, grx - 0.08, grz);
+
+          const rx2 = gx, ry2 = gy + 0.15, rz2 = gz - 0.06;
+          b(rx2 - 0.045, ry2, rz2, 0.014, 0.06, 0.06, 0.08, 0.10, 0.15, 0, grx, grz);
+          b(rx2 + 0.045, ry2, rz2, 0.014, 0.06, 0.06, 0.08, 0.10, 0.15, 0, grx, grz);
+          b(rx2, ry2 + 0.03, rz2, 0.10, 0.014, 0.06, 0.08, 0.10, 0.15, 0, grx, grz);
+          b(rx2, ry2, rz2, 0.008, 0.008, 0.008, 0.20, 0.80, 1.00, 0, grx, grz);
+        }
+      }
+
+      if (reloading) {
+        const p = cl(fin(relP, 0), 0, 1);
+        let lx = -0.28, ly = -0.16, lz = -0.48;
+        let lrx = 0.35, lry = 0.25;
+        let has = magHand > 0.05 || shell > 0.05 || cell > 0.05 || batt > 0.45;
+
+        if (p < 0.25) {
+          const t = p / 0.25;
+          lx = -0.28 + t * 0.20;
+          ly = -0.16 + t * 0.04;
+          lz = -0.48 + t * 0.04;
+        } else if (p < 0.55) {
+          const t = (p - 0.25) / 0.30;
+          lx = -0.08 + Math.sin(t * Math.PI) * 0.06;
+          ly = -0.12 - Math.sin(t * Math.PI) * 0.04;
+          lz = -0.44;
+        } else if (p < 0.80) {
+          const t = (p - 0.55) / 0.25;
+          lx = 0.02 - t * 0.04;
+          ly = -0.08 - t * 0.05;
+          lz = -0.45;
+        } else {
+          const t = (p - 0.80) / 0.20;
+          lx = -0.02 - t * 0.26;
+          ly = -0.13 - t * 0.05;
+          lz = -0.48;
+          has = false;
+        }
+
+        lx = fin(lx, -0.28); ly = fin(ly, -0.16); lz = fin(lz, -0.48);
+        lrx = fin(lrx, 0.35); lry = fin(lry, 0.25);
+        if (lz > -0.30) lz = -0.30;
+
+        b(lx - 0.06, ly - 0.08, lz + 0.16, 0.09, 0.10, 0.30, 0.14, 0.17, 0.24, lry, lrx);
+        b(lx, ly, lz, 0.08, 0.08, 0.10, 0.20, 0.24, 0.32, lry, lrx);
+
+        if (has) {
+          if (cur === 'shotgun') {
+            yc(lx, ly + 0.06, lz, 0.03, 0.12, 0.70, 0.10, 0.10, lry, lrx);
+          } else if (cur === 'sniper') {
+            b(lx, ly + 0.06, lz, 0.04, 0.10, 0.06, 0.20, 0.60, 1.00, lry, lrx);
+          } else if (cur === 'railgun') {
+            b(lx, ly + 0.06, lz, 0.05, 0.12, 0.07, 0.20, 0.70, 1.00, lry, lrx);
+          } else {
+            b(lx, ly + 0.06, lz, 0.05, 0.14, 0.08, 0.18, 0.22, 0.30, lry, lrx);
+          }
+        }
+      }
+
+      if (charging || throwP > 0) {
+        let rx, ry, rz, rrx, rry;
+
+        if (charging) {
+          const pull = charge * 0.12;
+          rx = 0.24 + pull * 0.25;
+          ry = -0.10 + pull * 0.08;
+          rz = -0.42 + pull * 0.18;
+          rrx = 0.25 + pull * 0.45;
+          rry = -0.25;
+        } else {
+          const tp = 1.0 - throwP;
+          rx = 0.22 - tp * 0.08;
+          ry = -0.08 - tp * 0.06;
+          rz = -0.30 - tp * 0.25;
+          rrx = -0.45 * (1.0 - tp);
+          rry = -0.08;
+        }
+
+        rx = fin(rx, 0.22); ry = fin(ry, -0.10); rz = fin(rz, -0.35);
+        rrx = fin(rrx, 0); rry = fin(rry, 0);
+        if (rz > -0.30) rz = -0.30;
+
+        b(rx + 0.08, ry - 0.10, rz + 0.20, 0.11, 0.12, 0.36, 0.14, 0.17, 0.24, rry, rrx);
+        b(rx + 0.08, ry - 0.05, rz + 0.20, 0.12, 0.04, 0.30, 0.08, 0.10, 0.14, rry, rrx);
+        b(rx, ry, rz, 0.09, 0.09, 0.12, 0.20, 0.24, 0.32, rry, rrx);
+
+        if (charging) {
+          b(rx - 0.04, ry + 0.02, rz - 0.02, 0.04, 0.08, 0.10, 0.10, 0.12, 0.18, rry, rrx);
+          yc(rx - 0.05, ry, rz - 0.05, 0.09, 0.26, 0.14, 0.18, 0.24, rry, rrx);
+          yc(rx - 0.05, ry, rz - 0.05, 0.095, 0.08, 1.00, 0.60, 0.00, rry, rrx);
+        }
+      }
+    }
+
+    let last = performance.now();
+
+    function loop(now) {
+      requestAnimationFrame(loop);
+
+      const dt = Math.min((now - last) / 1000, 0.1);
+      last = now;
+
+      if (cv.width !== window.innerWidth || cv.height !== window.innerHeight) {
+        cv.width = window.innerWidth;
+        cv.height = window.innerHeight;
+        gl.viewport(0, 0, cv.width, cv.height);
+      }
+
+      if (run) {
+        let feet = P.y - P.h;
+
+        if (dashCd > 0) {
+          dashCd = Math.max(0, dashCd - dt);
+          document.getElementById('df').style.width =
+            Math.round(((DCD - dashCd) / DCD) * 100) + '%';
+        }
+
+        if (charging) {
+          charge = Math.min(1.0, charge + dt * 0.95);
+          const pc = Math.round(charge * 100);
+          document.getElementById('cf').style.width = pc + '%';
+          document.getElementById('cl').innerText = 'СИЛА БРОСКА: ' + pc + '%';
+        }
+
+        if (throwP > 0) throwP = Math.max(0, throwP - dt * 3.5);
+
+        if (pump > 0) {
+          pump = Math.max(0, pump - dt * 2.5);
+          if (pump < 0.75 && !pumpS[0]) { pumpS[0] = true; snd('pumpB'); }
+          if (pump < 0.25 && !pumpS[1]) { pumpS[1] = true; snd('pumpF'); }
+        }
+
+        if (reloading) {
+          relP += dt / relDur;
+          relP = fin(relP, 0);
+          const st = RD[cur].st;
+          while (relIdx < st.length && relP >= st[relIdx][0]) {
+            snd(st[relIdx][1]);
+            relIdx++;
+          }
+          if (relP >= 1.0) {
+            reloading = false;
+            relP = 0.0;
+            relIdx = 0;
+            W[cur].ammo = W[cur].max;
+            hud();
+          }
+        }
+
+        const ta = (aiming && !reloading && !charging && throwP <= 0) ? 1.0 : 0.0;
+        aimP += (ta - aimP) * Math.min(1.0, 16.0 * dt);
+        aimP = cl(fin(aimP, 0), 0, 1);
+
+        const cr = document.getElementById('cross');
+        const sc = document.getElementById('scope');
+
+        if (cur === 'sniper' && aimP > 0.8) {
+          cr.style.opacity = '0';
+          sc.style.display = 'block';
+        } else {
+          sc.style.display = 'none';
+          cr.style.opacity = (aiming && !reloading) ? '0.2' : '1';
+        }
+
+        const hfx = Math.sin(P.yaw);
+        const hfz = -Math.cos(P.yaw);
+        const hrx = Math.cos(P.yaw);
+        const hrz = Math.sin(P.yaw);
+
+        let mx = 0, mz = 0;
+        if (K.w) { mx += hfx; mz += hfz; }
+        if (K.s) { mx -= hfx; mz -= hfz; }
+        if (K.a) { mx -= hrx; mz -= hrz; }
+        if (K.d) { mx += hrx; mz += hrz; }
+
+        let base = K.sh ? 18.0 : 12.0;
+        if (aiming) base *= 0.55;
+        const speed = base * dt;
+
+        let tdx = P.vx * dt;
+        let tdz = P.vz * dt;
+        const moving = (mx !== 0 || mz !== 0);
+
+        if (moving) {
+          const len = Math.hypot(mx, mz);
+          if (len > 0.001) {
+            tdx += (mx / len) * speed;
+            tdz += (mz / len) * speed;
+          }
+          if (!aiming) bob += dt * (K.sh ? 16.0 : 11.0);
+        }
+
+        if (moving && P.g) {
+          stT -= dt;
+          if (stT <= 0) {
+            stN++;
+            snd(stN % 2 === 0 ? 'stepL' : 'stepR');
+            stT = (K.sh ? 0.30 : 0.44) + Math.random() * 0.04;
+          }
+        } else {
+          stT = 0;
+        }
+
+        P.vx *= Math.max(0, 1 - 5.0 * dt);
+        P.vz *= Math.max(0, 1 - 5.0 * dt);
+
+        if (!blocked(P.x + tdx, P.z, feet)) P.x += tdx;
+        if (!blocked(P.x, P.z + tdz, feet)) P.z += tdz;
+
+        const gh = groundAt(P.x, P.z, feet);
+
+        if (K.sp && P.g) {
+          P.vy = 9.2;
+          P.g = false;
+        }
+
+        if (!P.g) {
+          P.vy -= 25 * dt;
+          feet += P.vy * dt;
+          if (feet <= gh) {
+            feet = gh;
+            P.vy = 0;
+            P.g = true;
+          }
+        } else {
+          if (feet > gh + 0.1) P.g = false;
+          else { feet = gh; P.vy = 0; }
+        }
+
+        P.y = feet + P.h;
+
+        if (padCd > 0) padCd -= dt;
+
+        const cf = P.y - P.h;
+        if (P.g && padCd <= 0 && cf < 0.5) {
+          for (const lp of PADS) {
+            if (Math.abs(P.x - lp.x) < lp.r && Math.abs(P.z - lp.z) < lp.r) {
+              P.vy = 20.0;
+              P.g = false;
+              padCd = 0.5;
+              snd('launch');
+              for (let i = 0; i < 24; i++) {
+                PA.push({
+                  x: P.x + (Math.random() - 0.5) * 2.0,
+                  y: 0.2,
+                  z: P.z + (Math.random() - 0.5) * 2.0,
+                  vx: (Math.random() - 0.5) * 0.25,
+                  vy: Math.random() * 0.6 + 0.35,
+                  vz: (Math.random() - 0.5) * 0.25,
+                  c: [0.2, 1.0, 0.4],
+                  l: 22
+                });
+              }
+              break;
+            }
+          }
+        }
+
+        rec = fin(rec, 0); recV = fin(recV, 0);
+        pit = fin(pit, 0); pitV = fin(pitV, 0);
+
+        let rem = Math.min(dt, 0.1);
+        const fs = 1 / 120;
+        while (rem > 0) {
+          const h = Math.min(fs, rem);
+          recV += (-RS * rec - RDMP * recV) * h;
+          rec += recV * h;
+          pitV += (-RS * pit - RDMP * pitV) * h;
+          pit += pitV * h;
+          rem -= h;
+        }
+
+        rec = cl(rec, -0.06, 0.14);
+        pit = cl(pit, -0.06, 0.20);
+        recV = cl(recV, -8, 8);
+        pitV = cl(pitV, -8, 8);
+
+        swX = fin(swX, 0); swY = fin(swY, 0);
+        gsX = fin(gsX, 0); gsY = fin(gsY, 0);
+        swX *= Math.max(0, 1 - 7 * dt);
+        swY *= Math.max(0, 1 - 7 * dt);
+        gsX += (swX - gsX) * Math.min(1, 16 * dt);
+        gsY += (swY - gsY) * Math.min(1, 16 * dt);
+        gsX = cl(gsX, -0.07, 0.07);
+        gsY = cl(gsY, -0.07, 0.07);
+
+        const mb = Math.sin(now * 0.003) * 0.15;
+
+        for (let i = MD.length - 1; i >= 0; i--) {
+          const m = MD[i];
+          m.r += 2.0 * dt;
+          const dxz = Math.hypot(P.x - m.x, P.z - m.z);
+          const dy = Math.abs((P.y - 0.85) - (m.y + mb));
+          if (dxz < 1.6 && dy < 1.5 && P.hp < 100) {
+            P.hp = Math.min(100, P.hp + 40);
+            snd('heal');
+            boom(m.x, m.y + mb, m.z, [0.0, 1.0, 0.4], 22);
+            const hf = document.getElementById('hm');
+            hf.style.opacity = '0.9';
+            setTimeout(function () { hf.style.opacity = '0'; }, 140);
+            hud();
+            MD.splice(i, 1);
+          }
+        }
+
+        for (let i = TR.length - 1; i >= 0; i--) {
+          TR[i].l -= dt;
+          if (TR[i].l <= 0) TR.splice(i, 1);
+        }
+
+        for (let i = B.length - 1; i >= 0; i--) {
+          const bl = B[i];
+
+          if (bl.t === 'lightning_rail') {
+            bl.px = bl.x; bl.py = bl.y; bl.pz = bl.z;
+          }
+
+          bl.x += bl.vx;
+          bl.y += bl.vy;
+          bl.z += bl.vz;
+          bl.l--;
+
+          if (bl.t === 'lightning_rail') {
+            const sd = Math.hypot(bl.x - bl.px, bl.y - bl.py, bl.z - bl.pz);
+            const steps = Math.max(2, Math.floor(sd / 0.8));
+            for (let s = 0; s < steps; s++) {
+              const fr = s / steps;
+              TR.push({
+                x: bl.px + (bl.x - bl.px) * fr + (Math.random() - 0.5) * 0.15,
+                y: bl.py + (bl.y - bl.py) * fr + (Math.random() - 0.5) * 0.15,
+                z: bl.pz + (bl.z - bl.pz) * fr + (Math.random() - 0.5) * 0.15,
+                s: 0.12 + Math.random() * 0.08,
+                c: Math.random() < 0.4 ? [1.0, 1.0, 1.0] : [0.15, 0.8, 1.0],
+                l: 0.28 + Math.random() * 0.2
+              });
+            }
+          }
+
+          if (inside(bl.x, bl.y, bl.z, 0.1) || bl.y <= -10) {
+            boom(bl.x, bl.y, bl.z, bl.c, bl.t === 'lightning_rail' ? 24 : 8);
+            B.splice(i, 1);
+            continue;
+          }
+
+          let hit = false;
+          for (let j = EN.length - 1; j >= 0; j--) {
+            const e = EN[j];
+            const hd = e.type === 'goliath' ? 1.8 : 1.3;
+            if (Math.hypot(bl.x - e.x, bl.y - e.y, bl.z - e.z) < hd) {
+              hit = true;
+              e.hp -= bl.d;
+              hitMark();
+              boom(bl.x, bl.y, bl.z,
+                bl.t === 'lightning_rail' ? [0.3, 0.85, 1.0] : [1.0, 0.0, 0.33],
+                bl.t === 'lightning_rail' ? 26 : 10);
+
+              if (e.hp <= 0) {
+                EN.splice(j, 1);
+                score += e.type === 'goliath' ? 300 : (e.type === 'viper' ? 180 : 150);
+                hud();
+                if (EN.length === 0) nextWave(1500);
+              }
+
+              if (bl.t !== 'lightning_rail') break;
+            }
+          }
+
+          if (hit && bl.t !== 'lightning_rail') B.splice(i, 1);
+          else if (bl.l <= 0) B.splice(i, 1);
+        }
+
+        for (let i = EP.length - 1; i >= 0; i--) {
+          const p = EP[i];
+          p.x += p.vx * dt;
+          p.y += p.vy * dt;
+          p.z += p.vz * dt;
+          p.l -= dt;
+
+          if (inside(p.x, p.y, p.z, 0.1) || p.y <= -10) {
+            boom(p.x, p.y, p.z, [1.0, 0.2, 0.0], 10);
+            EP.splice(i, 1);
+            continue;
+          }
+
+          if (Math.hypot(p.x - P.x, (p.y - 0.7) - P.y, p.z - P.z) < 0.9) {
+            damage(p.d);
+            boom(p.x, p.y, p.z, [1.0, 0.0, 0.2], 14);
+            EP.splice(i, 1);
+            continue;
+          }
+
+          if (p.l <= 0) EP.splice(i, 1);
+        }
+
+        for (let i = GR.length - 1; i >= 0; i--) {
+          const g = GR[i];
+          g.vy -= 22 * dt;
+          g.r += 8 * dt;
+
+          const nx = g.x + g.vx * dt;
+          const ny = g.y + g.vy * dt;
+          const nz = g.z + g.vz * dt;
+
+          if (Math.hypot(g.vx, g.vy, g.vz) > 2.0 && Math.random() < 0.4) {
+            PA.push({
+              x: g.x, y: g.y, z: g.z,
+              vx: (Math.random() - 0.5) * 0.1,
+              vy: (Math.random() - 0.5) * 0.1,
+              vz: (Math.random() - 0.5) * 0.1,
+              c: [1.0, 0.5, 0.0],
+              l: 10
+            });
+          }
+
+          if (inside(nx, ny, nz, 0.2)) {
+            g.vx = -g.vx * 0.5;
+            g.vz = -g.vz * 0.5;
+            g.vy = -g.vy * 0.5;
+          } else {
+            g.x = nx; g.y = ny; g.z = nz;
+          }
+
+          g.t -= dt;
+
+          if (g.t <= 0) {
+            snd('grenade');
+            boom(g.x, g.y, g.z, [1.0, 0.8, 0.0], 35);
+            boom(g.x, g.y, g.z, [1.0, 0.0, 0.33], 35);
+
+            const br = 9.5;
+            for (let j = EN.length - 1; j >= 0; j--) {
+              const e = EN[j];
+              const dx = e.x - g.x;
+              const dy = e.y - g.y;
+              const dz = e.z - g.z;
+              const d = Math.hypot(dx, dy, dz);
+              if (d <= br && d > 0.1) {
+                e.hp -= 4;
+                hitMark();
+                const f = (1.0 - d / br) * 22.0;
+                e.vx += (dx / d) * f;
+                e.vy += (dy / d) * f + 6.0;
+                e.vz += (dz / d) * f;
+                e.kb = 0.6;
+                if (e.hp <= 0) {
+                  EN.splice(j, 1);
+                  score += e.type === 'goliath' ? 350 : 200;
+                }
+              }
+            }
+
+            const pdx = P.x - g.x;
+            const pdy = (P.y - 0.8) - g.y;
+            const pdz = P.z - g.z;
+            const pd = Math.hypot(pdx, pdy, pdz);
+            if (pd <= br && pd > 0.2) {
+              const f = (1.0 - pd / br) * 18.0;
+              P.vx += (pdx / pd) * f;
+              P.vz += (pdz / pd) * f;
+              P.vy = Math.max(P.vy, f * 0.6 + 4.0);
+              P.g = false;
+              damage(Math.round((1.0 - pd / br) * 25));
+            }
+
+            hud();
+            if (EN.length === 0) nextWave(1500);
+            GR.splice(i, 1);
+          }
+        }
+
+        const lim = HA - 3.5;
+
+        for (let i = EN.length - 1; i >= 0; i--) {
+          const e = EN[i];
+          e.r += (e.type === 'viper' ? 6 : 3) * dt;
+          e.vx *= Math.max(0, 1 - 4.0 * dt);
+          e.vz *= Math.max(0, 1 - 4.0 * dt);
+
+          const tx = P.x - e.x;
+          const ty = P.y - e.y;
+          const tz = P.z - e.z;
+          const dist = Math.hypot(tx, ty, tz);
+          const hl = Math.hypot(tx, tz) || 1;
+
+          const fp = e.y - 1.0;
+          const gb = groundAt(e.x, e.z, fp + 0.5);
+          const gs = gb < -50 ? 0 : gb;
+          const pf = P.y - P.h;
+
+          let wf = gs;
+          if (hl < 16 && pf > gs + 0.4) wf = pf;
+
+          const ba = inside(e.x, fp + 1.8, e.z, 0.2);
+          const mv = e.sp;
+          const va = 5.0;
+
+          if (e.kb > 0) {
+            e.kb -= dt;
+            e.vy -= 25 * dt;
+          } else if (wf > fp + 0.25 && !ba) {
+            const gap = wf - fp;
+            const tv = Math.min(mv, gap * 1.5);
+            e.vy += (tv - e.vy) * Math.min(1.0, va * dt);
+            if (e.vy > mv) e.vy = mv;
+            if (e.vy < 0) e.vy = 0;
+          } else if (fp > wf + 0.3) {
+            const gap = fp - wf;
+            const tv = -Math.min(mv, gap * 1.5);
+            e.vy += (tv - e.vy) * Math.min(1.0, va * dt);
+            if (e.vy < -mv) e.vy = -mv;
+            if (e.vy > 0) e.vy = 0;
+          } else {
+            e.vy += (0 - e.vy) * Math.min(1.0, 10.0 * dt);
+            if (Math.abs(e.vy) < 0.05) e.vy = 0;
+          }
+
+          let ft = fp + e.vy * dt;
+          if (e.vy <= 0 && ft <= gs + 0.02) { ft = gs; e.vy = 0; }
+          if (ft < 0) { ft = 0; e.vy = 0; }
+          e.y = ft + 1.0;
+
+          let dx = tx / hl;
+          let dz = tz / hl;
+          const probe = 1.2 + e.size * 0.6;
+          const ahead = inside(e.x + dx * probe, e.y, e.z + dz * probe, 0.2);
+
+          if (ahead && e.at <= 0) {
+            const s1x = -dz, s1z = dx;
+            const s2x = dz, s2z = -dx;
+            const f1 = !inside(e.x + s1x * probe, e.y, e.z + s1z * probe, 0.2);
+            const f2 = !inside(e.x + s2x * probe, e.y, e.z + s2z * probe, 0.2);
+            let sx, sz;
+
+            if (f1 && !f2) { sx = s1x; sz = s1z; e.side = 1; }
+            else if (f2 && !f1) { sx = s2x; sz = s2z; e.side = 2; }
+            else if (f1 && f2) {
+              if (e.side === 1) { sx = s1x; sz = s1z; }
+              else if (e.side === 2) { sx = s2x; sz = s2z; }
+              else {
+                e.side = Math.random() < 0.5 ? 1 : 2;
+                sx = e.side === 1 ? s1x : s2x;
+                sz = e.side === 1 ? s1z : s2z;
+              }
+            } else { sx = -dx; sz = -dz; e.side = 0; }
+
+            e.ax = sx; e.az = sz; e.at = 0.6 + Math.random() * 0.5;
+          }
+
+          let mmx, mmz;
+          if (e.at > 0) {
+            e.at -= dt;
+            mmx = dx * 0.4 + e.ax * 0.9;
+            mmz = dz * 0.4 + e.az * 0.9;
+            const ml = Math.hypot(mmx, mmz) || 1;
+            mmx /= ml; mmz /= ml;
+          } else {
+            mmx = dx; mmz = dz;
+          }
+
+          e.st += dt;
+          if (e.st >= 1.0) {
+            const moved = Math.hypot(e.x - e.lx, e.z - e.lz);
+            if (moved < 0.5 && hl > 3.0) {
+              const ra = Math.random() * Math.PI * 2;
+              e.ax = Math.cos(ra);
+              e.az = Math.sin(ra);
+              e.at = 0.8;
+              e.side = 0;
+            }
+            e.lx = e.x; e.lz = e.z; e.st = 0;
+          }
+
+          const spd = e.sp * dt;
+          const stx = mmx * spd + e.vx * dt;
+          const stz = mmz * spd + e.vz * dt;
+
+          if (!inside(e.x + stx, e.y, e.z, 0.35)) e.x += stx;
+          if (!inside(e.x, e.y, e.z + stz, 0.35)) e.z += stz;
+
+          if (Math.abs(e.x) > lim) e.x = cl(e.x, -lim, lim);
+          if (Math.abs(e.z) > lim) e.z = cl(e.z, -lim, lim);
+
+          e.sc -= dt;
+          if (e.sc <= 0 && dist < 38.0) {
+            if (e.type === 'stalker') {
+              e.sc = 2.4 + Math.random() * 0.8;
+              snd('laser');
+              const sp2 = 20.0;
+              EP.push({
+                x: e.x, y: e.y, z: e.z,
+                vx: (tx / dist) * sp2,
+                vy: (ty / dist) * sp2,
+                vz: (tz / dist) * sp2,
+                d: 10, c: [1.0, 0.1, 0.1], s: 0.22, l: 3.0
+              });
+            } else if (e.type === 'goliath') {
+              e.sc = 3.6 + Math.random() * 1.0;
+              snd('boom');
+              const sp2 = 14.0;
+              EP.push({
+                x: e.x, y: e.y + 0.3, z: e.z,
+                vx: (tx / dist) * sp2,
+                vy: (ty / dist) * sp2,
+                vz: (tz / dist) * sp2,
+                d: 22, c: [1.0, 0.6, 0.0], s: 0.42, l: 4.0
+              });
+            }
+          }
+
+          const ad = e.type === 'goliath' ? 2.2 : 1.6;
+          if (dist < ad) {
+            const dm = e.type === 'goliath' ? 20 : (e.type === 'viper' ? 22 : 12);
+            damage(dm);
+            snd('boom');
+            boom(e.x, e.y, e.z, e.type === 'viper' ? [0.8, 0.0, 1.0] : [1.0, 0.0, 0.33], 24);
+            EN.splice(i, 1);
+            hud();
+            if (EN.length === 0) nextWave(800);
+          }
+        }
+
+        for (let i = PA.length - 1; i >= 0; i--) {
+          const p = PA[i];
+          p.x += p.vx;
+          p.y += p.vy;
+          p.z += p.vz;
+          p.l--;
+          if (p.l <= 0) PA.splice(i, 1);
+        }
+
+        radar();
+      }
+
+      gl.clearColor(0.05, 0.02, 0.12, 1.0);
+      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+      gl.enable(gl.DEPTH_TEST);
+      gl.depthMask(true);
+      gl.disable(gl.BLEND);
+      gl.uniform1i(uVM, 0);
+
+      const asp = cv.width / cv.height;
+      const nf = 75;
+      const zf = W[cur].fov;
+      const fd = nf - (nf - zf) * aimP;
+      const fr = fd * Math.PI / 180;
+      const f = 1.0 / Math.tan(fr / 2);
+      const near = 0.2;
+      const far = 280.0;
+      const nfd = 1 / (near - far);
+
+      gl.uniformMatrix4fv(uProj, false, new Float32Array([
+        f / asp, 0, 0, 0,
+        0, f, 0, 0,
+        0, 0, (far + near) * nfd, -1,
+        0, 0, 2 * far * near * nfd, 0
+      ]));
+
+      const fx = Math.sin(P.yaw) * Math.cos(P.pitch);
+      const fy = Math.sin(P.pitch);
+      const fz = -Math.cos(P.yaw) * Math.cos(P.pitch);
+      const rx = Math.cos(P.yaw);
+      const ry = 0;
+      const rz = Math.sin(P.yaw);
+      const ux = -rz * fy;
+      const uy = Math.cos(P.pitch);
+      const uz = rx * fy;
+      const px = P.x, py = P.y, pz = P.z;
+
+      gl.uniformMatrix4fv(uView, false, new Float32Array([
+        rx, ux, -fx, 0,
+        ry, uy, -fy, 0,
+        rz, uz, -fz, 0,
+        -(rx * px + ry * py + rz * pz),
+        -(ux * px + uy * py + uz * pz),
+        fx * px + fy * py + fz * pz,
+        1
+      ]));
+
+      for (const o of OBS) {
+        if (o.t === 'b') continue;
+
+        const sx = o.x2 - o.x1;
+        const sy = o.y2 - o.y1;
+        const sz = o.z2 - o.z1;
+        const cx = (o.x1 + o.x2) / 2;
+        const cz = (o.z1 + o.z2) / 2;
+        const cy = o.y1 + sy / 2;
+
+        if (o.t === 'd') {
+          b(cx, cy, cz, sx, sy, sz, 0.06, 0.06, 0.09);
+          for (let gx = -HA + 5; gx <= HA - 5; gx += 10) b(gx, 0.01, 0, 0.1, 0.02, AS, 0.0, 0.3, 0.5);
+          for (let gz = -HA + 5; gz <= HA - 5; gz += 10) b(0, 0.01, gz, AS, 0.02, 0.1, 0.0, 0.3, 0.5);
+        } else if (o.t === 'hb') {
+          b(cx, cy, cz, sx, sy, sz, 0.10, 0.10, 0.15);
+        } else if (o.t === 'ht') {
+          b(cx, cy, cz, sx, sy, sz, 0.12, 0.12, 0.18);
+          b(cx, o.y2 - 0.02, cz, sx, 0.04, sz, 0.0, 1.0, 1.0);
+        } else if (o.t === 'tw') {
+          b(cx, cy, cz, sx, sy, sz, 0.08, 0.08, 0.12);
+          b(cx, o.y2 - 0.05, cz, sx, 0.1, sz, 1.0, 0.0, 1.0);
+          b(cx, cy, cz, sx + 0.1, sy * 0.9, 0.15, 0.0, 0.5, 1.0);
+          b(cx, cy, cz, 0.15, sy * 0.9, sz + 0.1, 0.0, 0.5, 1.0);
+        } else if (o.t === 'cv') {
+          b(cx, cy, cz, sx, sy, sz, 0.12, 0.12, 0.16);
+          b(cx, o.y2 - 0.2, cz, sx * 0.8, 0.15, sz * 0.8, 0.0, 0.8, 0.8);
+        } else if (o.t === 'py') {
+          b(cx, cy, cz, sx, sy, sz, 0.15, 0.15, 0.20);
+          b(cx, o.y2 - 0.3, cz, sx * 1.5, 0.4, sz * 1.5, 1.0, 0.5, 0.0);
+        } else if (o.t === 'br') {
+          b(cx, cy, cz, sx, sy, sz, 0.10, 0.10, 0.14);
+          b(cx, o.y2 - 0.05, cz, sx, 0.1, sz, 0.8, 0.8, 0.0);
+        } else {
+          b(cx, cy, cz, sx, sy, sz, 0.08, 0.09, 0.12);
+        }
+      }
+
+      const pp = (Math.sin(now * 0.004) + 1.0) * 0.5;
+      const ab = Math.sin(now * 0.003) * 0.35;
+      const ar = now * 0.0012;
+
+      for (const lp of PADS) {
+        const ps = lp.r * 2;
+        b(lp.x, 0.06, lp.z, ps + 1.0, 0.14, ps + 1.0, 0.35, 0.37, 0.40);
+        b(lp.x, 0.09, lp.z, ps + 0.5, 0.10, ps + 0.5, 0.25, 0.27, 0.30);
+
+        const gb = 0.45 + pp * 0.35;
+        b(lp.x, 0.11, lp.z, ps, 0.09, ps, 0.0, gb, 0.12);
+        b(lp.x, 0.13, lp.z, ps * 0.62, 0.06, ps * 0.62, 0.25, gb + 0.25, 0.30);
+
+        b(lp.x - ps / 2 - 0.3, 0.16, lp.z - ps / 2 - 0.3, 0.5, 0.12, 0.5, 0.0, 0.9, 0.3);
+        b(lp.x + ps / 2 + 0.3, 0.16, lp.z - ps / 2 - 0.3, 0.5, 0.12, 0.5, 0.0, 0.9, 0.3);
+        b(lp.x - ps / 2 - 0.3, 0.16, lp.z + ps / 2 + 0.3, 0.5, 0.12, 0.5, 0.0, 0.9, 0.3);
+        b(lp.x + ps / 2 + 0.3, 0.16, lp.z + ps / 2 + 0.3, 0.5, 0.12, 0.5, 0.0, 0.9, 0.3);
+
+        const ay = 2.3 + ab;
+        b(lp.x, ay + 0.65, lp.z, 0.55, 1.30, 0.50, 0.12, 1.0, 0.38, ar);
+        setCol(0.35, 1.0, 0.55, 1.0, tri.c);
+        drawTri(lp.x, ay + 1.30, lp.z, 1.70, 1.10, 0.50, ar);
+        b(lp.x, ay + 2.50, lp.z, 0.18, 0.18, 0.18, 0.95, 1.0, 0.95, ar);
+      }
+
+      const mb2 = Math.sin(now * 0.003) * 0.15;
+      for (const m of MD) {
+        const my = m.y + mb2;
+        b(m.x, my - 0.22, m.z, 0.85, 0.04, 0.85, 0.0, 1.0, 0.5, m.r * 1.5);
+        b(m.x, my, m.z, 0.65, 0.45, 0.65, 0.92, 0.96, 1.0, m.r);
+        b(m.x, my, m.z, 0.45, 0.46, 0.80, 0.92, 0.96, 1.0, m.r);
+        b(m.x, my, m.z, 0.76, 0.16, 0.22, 0.0, 1.0, 0.4, m.r);
+        b(m.x, my, m.z, 0.22, 0.16, 0.76, 0.0, 1.0, 0.4, m.r);
+      }
+
+      for (const bl of B) {
+        if (bl.t === 'plasma_orb') {
+          setCol(bl.c[0], bl.c[1], bl.c[2], 1.0, sph.c);
+          drawEll(bl.x, bl.y, bl.z, bl.s, bl.s, bl.s, bl.vx, bl.vy, bl.vz);
+          setCol(1.0, 1.0, 1.0, 1.0, sph.c);
+          drawEll(bl.x, bl.y, bl.z, bl.s * 0.45, bl.s * 0.45, bl.s * 0.45, bl.vx, bl.vy, bl.vz);
+        } else if (bl.t === 'lightning_rail') {
+          setCol(0.2, 0.8, 1.0, 1.0, sph.c);
+          drawEll(bl.x, bl.y, bl.z, bl.s * 0.65, bl.s * 0.65, bl.s * 2.2, bl.vx, bl.vy, bl.vz);
+          setCol(1.0, 1.0, 1.0, 1.0, sph.c);
+          drawEll(bl.x, bl.y, bl.z, bl.s * 0.30, bl.s * 0.30, bl.s * 1.2, bl.vx, bl.vy, bl.vz);
+        } else {
+          setCol(bl.c[0], bl.c[1], bl.c[2], 1.0, sph.c);
+          drawEll(bl.x, bl.y, bl.z, bl.s * 0.55, bl.s * 0.55, bl.s * 1.8, bl.vx, bl.vy, bl.vz);
+          setCol(1.0, 1.0, 1.0, 1.0, sph.c);
+          drawEll(bl.x, bl.y, bl.z, bl.s * 0.25, bl.s * 0.25, bl.s * 0.9, bl.vx, bl.vy, bl.vz);
+        }
+      }
+
+      if (TR.length > 0) {
+        gl.enable(gl.BLEND);
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+        gl.depthMask(false);
+        for (const t of TR) {
+          setCol(t.c[0], t.c[1], t.c[2], t.l * 2.5, sph.c);
+          drawEll(t.x, t.y, t.z, t.s, t.s, t.s, 0, 1, 0);
+        }
+        gl.depthMask(true);
+        gl.disable(gl.BLEND);
+      }
+
+      for (const p of EP) {
+        setCol(p.c[0], p.c[1], p.c[2], 1.0, sph.c);
+        drawEll(p.x, p.y, p.z, p.s * 0.8, p.s * 0.8, p.s * 1.6, p.vx, p.vy, p.vz);
+        setCol(1.0, 1.0, 1.0, 1.0, sph.c);
+        drawEll(p.x, p.y, p.z, p.s * 0.35, p.s * 0.35, p.s * 0.8, p.vx, p.vy, p.vz);
+      }
+
+      for (const g of GR) {
+        const tr = Math.max(0, g.t);
+        const bf = (1.9 - tr) * 16.0;
+        const blink = Math.sin(now * 0.001 * bf) > 0;
+        yc(g.x, g.y, g.z, 0.16, 0.42, 0.14, 0.18, 0.24, g.r, g.r * 0.6);
+        yc(g.x, g.y + 0.20, g.z, 0.18, 0.06, 0.08, 0.10, 0.15, g.r, g.r * 0.6);
+        yc(g.x, g.y - 0.20, g.z, 0.18, 0.06, 0.08, 0.10, 0.15, g.r, g.r * 0.6);
+        if (blink) yc(g.x, g.y, g.z, 0.19, 0.14, 1.0, 0.05, 0.25, g.r, g.r * 0.6);
+        else yc(g.x, g.y, g.z, 0.17, 0.12, 1.0, 0.60, 0.0, g.r, g.r * 0.6);
+      }
+
+      for (const e of EN) {
+        if (e.type === 'goliath') {
+          b(e.x, e.y, e.z, 1.5, 0.9, 1.5, 0.13, 0.16, 0.22);
+          b(e.x, e.y + 0.35, e.z, 1.1, 0.4, 1.1, 0.20, 0.25, 0.35);
+          b(e.x, e.y + 0.35, e.z - 0.58, 0.6, 0.18, 0.12, 0.90, 0.65, 0.0);
+          b(e.x - 0.95, e.y, e.z, 0.25, 0.25, 1.4, 0.08, 0.10, 0.14);
+          b(e.x + 0.95, e.y, e.z, 0.25, 0.25, 1.4, 0.08, 0.10, 0.14);
+          yc(e.x - 0.95, e.y, e.z + 0.5, 0.18, 0.6, 0.25, 0.30, 0.40);
+          yc(e.x + 0.95, e.y, e.z + 0.5, 0.18, 0.6, 0.25, 0.30, 0.40);
+        } else if (e.type === 'viper') {
+          b(e.x, e.y, e.z, 0.7, 0.25, 1.1, 0.16, 0.12, 0.22, e.r);
+          b(e.x, e.y, e.z + 0.1, 1.4, 0.06, 0.45, 0.70, 0.10, 0.90, e.r);
+          yc(e.x, e.y, e.z - 0.55, 0.16, 0.25, 1.0, 0.10, 0.40, e.r * 3.0, 1.57);
+        } else {
+          b(e.x, e.y, e.z, 0.7, 0.45, 0.8, 0.15, 0.18, 0.24);
+          b(e.x, e.y + 0.05, e.z - 0.42, 0.35, 0.15, 0.1, 1.0, 0.05, 0.30);
+          b(e.x - 0.65, e.y, e.z, 0.45, 0.12, 0.2, 0.10, 0.13, 0.18);
+          b(e.x + 0.65, e.y, e.z, 0.45, 0.12, 0.2, 0.10, 0.13, 0.18);
+          b(e.x - 0.65, e.y + 0.1, e.z, 0.75, 0.04, 0.12, 0.0, 0.85, 0.90, e.r * 2.5);
+          b(e.x + 0.65, e.y + 0.1, e.z, 0.75, 0.04, 0.12, 0.0, 0.85, 0.90, -e.r * 2.5);
+        }
+
+        const by = e.y + (e.type === 'goliath' ? 1.4 : 1.1);
+        const tw = e.type === 'goliath' ? 1.6 : 1.1;
+        b(e.x, by, e.z, tw, 0.12, 0.06, 0.05, 0.08, 0.15, P.yaw);
+
+        const hp = cl(e.hp / e.max, 0, 1);
+        const fw = tw * hp;
+        let hr = 0.0, hg = 1.0, hb = 0.3;
+        if (hp < 0.6) { hr = 1.0; hg = 0.8; hb = 0.0; }
+        if (hp < 0.35) { hr = 1.0; hg = 0.0; hb = 0.2; }
+        b(e.x, by, e.z, fw, 0.096, 0.08, hr, hg, hb, P.yaw);
+      }
+
+      for (const p of PA) {
+        b(p.x, p.y, p.z, 0.12, 0.12, 0.12, p.c[0], p.c[1], p.c[2]);
+      }
+
+      renderVM(now, asp);
+    }
+
+    loop(performance.now());
+  </script>
+</body>
+</html>
